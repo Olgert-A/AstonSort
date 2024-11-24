@@ -1,17 +1,18 @@
 package view;
 
-public enum CarFieldEnum implements ViewRepresentationEnum {
-    MODEL("Модель"),
-    POWER("Мощность"),
-    YEAR("Год выпуска"),
+public enum BookFieldEnum implements ViewRepresentationEnum {
+    AUTHOR("Автор"),
+    TITLE("Название книги"),
+    PAGES("Количество страниц"),
     ALL("Все поля");
 
     private final String localeName;
 
-    CarFieldEnum(String localeName) {
+    BookFieldEnum(String localeName) {
         this.localeName = localeName;
     }
 
+    @Override
     public String getLocaleName() {
         return localeName;
     }
@@ -26,10 +27,8 @@ public enum CarFieldEnum implements ViewRepresentationEnum {
 
     @Override
     public String toString() {
-        return "CarFieldEnumerator{" +
+        return "BookFieldEnum{" +
                 "localeName='" + localeName + '\'' +
                 '}';
     }
-
-
 }
