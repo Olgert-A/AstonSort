@@ -24,12 +24,12 @@ public class BookStrategy extends AbstractStrategy implements Strategy {
     }
 
     @Override
-    public void sortBy(ViewRepresentationEnum field) {
+    public void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven) {
 
     }
 
     @Override
-    public void sortByAllFields() {
+    public void sortByAllFields(boolean sortOnlyEven) {
 
     }
 

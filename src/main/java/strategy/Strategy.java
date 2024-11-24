@@ -10,7 +10,7 @@ public interface Strategy {
     void saveResultsToFile(String name);
     void showResultsData();
 
-    void sortBy(ViewRepresentationEnum field);
-    void sortByAllFields();
+    void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven);
+    void sortByAllFields(boolean sortOnlyEven);
     void searchByField(ViewRepresentationEnum field, Number fieldValue);
 }
