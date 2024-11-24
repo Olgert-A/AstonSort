@@ -29,6 +29,11 @@ public class KorneplodStrategy extends AbstractStrategy implements Strategy {
     }
 
     @Override
+    public void sortByAllFields() {
+
+    }
+
+    @Override
     public void searchByField(ViewRepresentationEnum field, Number fieldValue) {
 
     }

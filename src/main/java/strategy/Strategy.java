@@ -11,5 +11,6 @@ public interface Strategy {
     void showResultsData();
 
     void sortBy(ViewRepresentationEnum field);
+    void sortByAllFields();
     void searchByField(ViewRepresentationEnum field, Number fieldValue);
 }
