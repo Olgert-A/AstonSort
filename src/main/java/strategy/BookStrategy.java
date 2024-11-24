@@ -1,10 +1,6 @@
 package strategy;
 
-import data.entities.Book;
 import view.ViewRepresentationEnum;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BookStrategy extends AbstractStrategy implements Strategy {
     @Override
