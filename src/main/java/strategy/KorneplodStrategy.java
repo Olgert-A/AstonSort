@@ -1,8 +1,9 @@
 package strategy;
 
+import data.entities.Korneplod;
 import view.ViewRepresentationEnum;
 
-public class KorneplodStrategy extends AbstractStrategy implements Strategy {
+public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
     @Override
     public void collectInputData(int amount) {
 
