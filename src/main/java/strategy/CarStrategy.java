@@ -1,8 +1,9 @@
 package strategy;
 
+import data.entities.Car;
 import view.ViewRepresentationEnum;
 
-public class CarStrategy extends AbstractStrategy implements Strategy {
+public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
     public void collectInputData(int amount) {
 
