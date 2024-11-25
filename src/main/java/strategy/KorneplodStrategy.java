@@ -15,8 +15,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
-    public void collectDataFromFile(String name, int amount) {
+    public boolean collectDataFromFile(String name, int amount) {
 
+        return false;
     }
 
     @Override

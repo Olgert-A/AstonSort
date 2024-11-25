@@ -15,8 +15,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
-    public void collectDataFromFile(String name, int amount) {
+    public boolean collectDataFromFile(String name, int amount) {
 
+        return false;
     }
 
     @Override

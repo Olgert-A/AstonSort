@@ -5,7 +5,7 @@ import view.ViewRepresentationEnum;
 public interface Strategy {
     void collectInputData(int amount);
     void collectRandomData(int amount);
-    void collectDataFromFile(String name, int amount);
+    boolean collectDataFromFile(String name, int amount);
 
     void saveResultsToFile(String name);
     void showResultsData();
