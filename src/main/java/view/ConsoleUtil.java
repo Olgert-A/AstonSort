@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class ConsoleUtil {
     private static final List<Class<?>> INPUT_COMPATIBLE_CLASSES = List.of(Integer.class, Double.class, String.class);
     public static final int DEFAULT_READ_ATTEMPTS = 3;
+    private static final Scanner scanner = new Scanner(System.in);
 
 
     public static <T> T getValue(Class<T> cls,
@@ -34,26 +35,30 @@ public class ConsoleUtil {
 
         T result = null;
 
-        try(Scanner scanner = new Scanner(System.in)) {
-            for(int attempt=0; attempt<readAttempts; attempt++) {
-                System.out.println(requestText);
-                String line = scanner.nextLine();
+        for(int attempt=0; attempt<readAttempts; attempt++) {
+            System.out.println(requestText);
+            String line = scanner.nextLine();;
 
+            try {
                 if(cls.isAssignableFrom(Integer.class))
                     result = (T) Integer.valueOf(line);
                 else if(cls.isAssignableFrom(Double.class))
                     result = (T) Double.valueOf(line);
                 else if(cls.isAssignableFrom(String.class))
                     result = (T) line;
-
-                if(validate != null && invalidText != null)
-                    if(!validate.isValid(result)) {
-                        System.out.println(invalidText);
-                        result = null;
-                    }
-                    else
-                        break;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введённое значение должно быть числом!\n");
+                continue;
             }
+
+
+            if(validate != null && invalidText != null)
+                if(!validate.isValid(result)) {
+                    System.out.println(invalidText);
+                    result = null;
+                }
+                else
+                    break;
         }
 
         return result;
