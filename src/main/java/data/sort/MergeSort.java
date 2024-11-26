@@ -6,27 +6,27 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class MergeSort implements SortAlgorithm {
+public class MergeSort<T> implements SortAlgorithm<T> {
 
     @Override
-    public List sort(List data, Comparator comparator) {
+    public List<T> sort(List<T> data, Comparator<T> comparator) {
         if (data == null) return null;
         if (data.size() < 2) return data;
         int mid = data.size() / 2;
-        List left = new ArrayList(data.subList(0, mid));//List.copyOf(data.subList(0, mid));
-        List right = new ArrayList(data.subList(mid, data.size()));
+        List<T> left = new ArrayList<>(data.subList(0, mid));//List.copyOf(data.subList(0, mid));
+        List<T> right = new ArrayList<>(data.subList(mid, data.size()));
 
         left = sort(left, comparator);
         right = sort(right, comparator);
         return merge(left, right, comparator);
     }
 
-    public List merge(List a, List b, Comparator comparator) {
+    private List<T> merge(List<T> a, List<T> b, Comparator<T> comparator) {
         int pA = 0;
         int pB = 0;
         int size = a.size() + b.size();
         int k = 0;
-        List res = new ArrayList();
+        List<T> res = new ArrayList<>();
 
         while (size > k + 1) {
             if (pA < a.size() && pB < b.size()) {
@@ -53,7 +53,7 @@ public class MergeSort implements SortAlgorithm {
     }
 
     @Override
-    public List sortEvenValues(List data, Comparator comparator, ParityChecker parityChecker) {
+    public List<T> sortEvenValues(List<T> data, Comparator<T> comparator, ParityChecker<T> parityChecker) {
         return List.of();
     }
 }
