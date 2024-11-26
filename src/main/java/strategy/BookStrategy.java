@@ -1,11 +1,11 @@
 package strategy;
 
 import data.entities.Book;
-import view.BookFieldEnum;
+import util.BookFieldEnum;
 
 import java.util.Objects;
 
-import static view.ConsoleUtil.getValue;
+import static util.ConsoleUtil.getValue;
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     @Override

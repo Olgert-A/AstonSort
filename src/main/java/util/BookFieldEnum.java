@@ -1,19 +1,20 @@
-package view;
+package util;
 
-public enum EntityEnum implements ViewRepresentation {
-    CAR("Машина"),
-    BOOK("Книга"),
-    KORNEPLOD("Корнеплод");
+public enum BookFieldEnum implements ViewRepresentation {
+    AUTHOR("Автор"),
+    TITLE("Название книги"),
+    PAGES("Количество страниц"),
+    ALL("Все поля");
 
     private final String localeName;
 
-    EntityEnum(String localeName) {
+    BookFieldEnum(String localeName) {
         this.localeName = localeName;
     }
 
     @Override
     public String getLocaleName() {
-        return this.localeName;
+        return localeName;
     }
 
     @Override
@@ -26,7 +27,7 @@ public enum EntityEnum implements ViewRepresentation {
 
     @Override
     public String toString() {
-        return "ClassReprEnum{" +
+        return "BookFieldEnum{" +
                 "localeName='" + localeName + '\'' +
                 '}';
     }

@@ -2,8 +2,8 @@ import strategy.BookStrategy;
 import strategy.CarStrategy;
 import strategy.KorneplodStrategy;
 import strategy.Strategy;
-import view.EntityEnum;
-import static view.ConsoleUtil.getValue;
+import util.EntityEnum;
+import static util.ConsoleUtil.getValue;
 
 public class Main {
     public static int DATA_TYPES_AMOUNT = EntityEnum.values().length;

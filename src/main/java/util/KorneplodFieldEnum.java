@@ -1,14 +1,14 @@
-package view;
+package util;
 
-public enum BookFieldEnum implements ViewRepresentation {
-    AUTHOR("Автор"),
-    TITLE("Название книги"),
-    PAGES("Количество страниц"),
+public enum KorneplodFieldEnum implements ViewRepresentation {
+    TYPE("Тип корнеплода"),
+    WEIGHT("Вес"),
+    COLOR("Цвет"),
     ALL("Все поля");
 
     private final String localeName;
 
-    BookFieldEnum(String localeName) {
+    KorneplodFieldEnum(String localeName) {
         this.localeName = localeName;
     }
 
@@ -24,10 +24,9 @@ public enum BookFieldEnum implements ViewRepresentation {
                 this.localeName;
     }
 
-
     @Override
     public String toString() {
-        return "BookFieldEnum{" +
+        return "KorneplodFieldEnum{" +
                 "localeName='" + localeName + '\'' +
                 '}';
     }

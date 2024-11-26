@@ -1,4 +1,4 @@
-package view;
+package util;
 
 public enum CarFieldEnum implements ViewRepresentation {
     MODEL("Модель"),
