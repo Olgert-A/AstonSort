@@ -21,8 +21,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
-    public void saveResultsToFile(String name) {
+    public boolean saveResultsToFile(String name) {
 
+        return false;
     }
 
     @Override

@@ -3,9 +3,7 @@ package strategy;
 import data.entities.Book;
 import view.ViewRepresentationEnum;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,21 +36,24 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             while((line = bufferedReader.readLine()) != null && counter < amount) {
                 String[] splitLine = line.split(":");
                 if (line.startsWith("[Author")) {
-                    parsedName.add(splitLine[2].trim());
-                } else if (line.startsWith("Title:")) {
-                    parsedTitle.add(splitLine[2].trim());
-                } else if (line.startsWith("Pages:")) {
-                    parsedPages.add(Integer.parseInt(splitLine[2]));
+                    parsedName.add(splitLine[1].trim());
+                } else if (line.startsWith("Title")) {
+                    parsedTitle.add(splitLine[1].trim());
+                } else if (line.startsWith("Pages")) {
+                    if (splitLine[1].endsWith("]")) {
+                        String intLine = splitLine[1].substring(0, splitLine[1].length()-1).trim();
+                        parsedPages.add(Integer.valueOf(intLine,10));
+                        counter++;
+                    }
                 } else {
                     continue;}
-                counter++;
             }
 
             if (counter < amount) {
                 System.out.println("Файл закончился раньше, чем массив заполнился");
                 amount = counter;
             }
-
+            bufferedReader.close();
             for(int i = 0; i < amount; i++) {
                 //BookValidatorImpl bvi = new BookValidatorImpl();
                 // if (!(bvi.isAuthorValid(parsedName.get(i)){
@@ -75,8 +76,19 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
 
     @Override
-    public void saveResultsToFile(String name) {
+    public boolean saveResultsToFile(String name) {
+        try (FileWriter fileWriter = new FileWriter(name)) {
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            if (processedData.isEmpty()) {
+                System.out.println("Нечего записывать в файл.");
+                return false;
+            }
 
+           // if (fileWriter.)
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
     }
 
     @Override
@@ -97,5 +109,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     @Override
     public void showResultsData() {
 
+    }
+
+    public static void main(String[] args) {
+        String fileName = "C:\\Users\\reeze\\IdeaProjects\\newAstonProject\\input.txt";
+        BookStrategy bookStrategy = new BookStrategy();
+        bookStrategy.collectDataFromFile(fileName, 3);
+        System.out.println(bookStrategy.rawData);
     }
 }

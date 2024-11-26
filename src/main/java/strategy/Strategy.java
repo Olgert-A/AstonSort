@@ -7,7 +7,7 @@ public interface Strategy {
     void collectRandomData(int amount);
     boolean collectDataFromFile(String name, int amount);
 
-    void saveResultsToFile(String name);
+    boolean saveResultsToFile(String name);
     void showResultsData();
 
     void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven);
