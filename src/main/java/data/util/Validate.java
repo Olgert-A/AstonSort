@@ -1,4 +1,4 @@
-package data.validate;
+package data.util;
 
 @FunctionalInterface
 public interface Validate<T> {

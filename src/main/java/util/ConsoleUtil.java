@@ -1,6 +1,6 @@
 package util;
 
-import data.validate.Validate;
+import data.util.Validate;
 
 import java.util.List;
 import java.util.Scanner;
