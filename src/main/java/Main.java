@@ -2,7 +2,7 @@ import strategy.BookStrategy;
 import strategy.CarStrategy;
 import strategy.KorneplodStrategy;
 import strategy.Strategy;
-import util.EntityEnum;
+import util.enums.EntityEnum;
 import static util.ConsoleUtil.getValue;
 
 public class Main {

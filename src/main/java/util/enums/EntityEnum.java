@@ -1,19 +1,21 @@
-package util;
+package util.enums;
 
-public enum CarFieldEnum implements ViewRepresentation {
-    MODEL("Модель"),
-    POWER("Мощность"),
-    YEAR("Год выпуска"),
-    ALL("Все поля");
+import util.ViewRepresentation;
+
+public enum EntityEnum implements ViewRepresentation {
+    CAR("Машина"),
+    BOOK("Книга"),
+    KORNEPLOD("Корнеплод");
 
     private final String localeName;
 
-    CarFieldEnum(String localeName) {
+    EntityEnum(String localeName) {
         this.localeName = localeName;
     }
 
+    @Override
     public String getLocaleName() {
-        return localeName;
+        return this.localeName;
     }
 
     @Override
@@ -26,10 +28,8 @@ public enum CarFieldEnum implements ViewRepresentation {
 
     @Override
     public String toString() {
-        return "CarFieldEnumerator{" +
+        return "ClassReprEnum{" +
                 "localeName='" + localeName + '\'' +
                 '}';
     }
-
-
 }

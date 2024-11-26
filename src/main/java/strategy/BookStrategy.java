@@ -1,7 +1,7 @@
 package strategy;
 
 import data.entities.Book;
-import util.BookFieldEnum;
+import util.enums.BookFieldEnum;
 
 import java.util.Objects;
 
