@@ -10,12 +10,13 @@ public class ConsoleUtil {
     public static final int DEFAULT_READ_ATTEMPTS = 3;
     private static final Scanner scanner = new Scanner(System.in);
 
-
+    @SuppressWarnings("unckecked")
     public static <T> T getValue(Class<T> cls,
                                  String requestText) {
         return getValue(cls, requestText, null, null);
     }
 
+    @SuppressWarnings("unckecked")
     public static <T> T getValue(Class<T> cls,
                                  String requestText,
                                  Validate<T> validate,
@@ -24,7 +25,7 @@ public class ConsoleUtil {
     }
 
 
-
+    @SuppressWarnings("unckecked")
     public static <T> T getValue(Class<T> cls,
                                  String requestText,
                                  int readAttempts,
