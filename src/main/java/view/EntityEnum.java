@@ -1,13 +1,13 @@
 package view;
 
-public enum ClassReprEnum implements ViewRepresentationEnum {
+public enum EntityEnum implements ViewRepresentationEnum {
     CAR("Машина"),
     BOOK("Книга"),
     KORNEPLOD("Корнеплод");
 
     private final String localeName;
 
-    ClassReprEnum(String localeName) {
+    EntityEnum(String localeName) {
         this.localeName = localeName;
     }
 

@@ -2,17 +2,17 @@ import strategy.BookStrategy;
 import strategy.CarStrategy;
 import strategy.KorneplodStrategy;
 import strategy.Strategy;
-import view.ClassReprEnum;
+import view.EntityEnum;
 import static view.ConsoleUtil.getValue;
 
 public class Main {
-    public static int DATA_TYPES_AMOUNT = ClassReprEnum.values().length;
+    public static int DATA_TYPES_AMOUNT = EntityEnum.values().length;
     public static String DATA_TYPES_INVALID_TEXT = "Ошибка: Значение должно быть от 0 до " + (DATA_TYPES_AMOUNT-1);
     public static String DATA_SIZE_INVALID_TEXT = "Ошибка: Размер массива должен быть больше 2";
 
     public static String getDataTypeRequestText() {
         StringBuilder requestTextBuilder = new StringBuilder("Введите тип данных:");
-        for(var dataType : ClassReprEnum.values())
+        for(var dataType : EntityEnum.values())
             requestTextBuilder.append("\n").append(dataType.getRepresentation());
         return requestTextBuilder.toString();
     }
