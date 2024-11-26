@@ -1,6 +1,6 @@
 package view;
 
-public interface ViewRepresentationEnum {
+public interface ViewRepresentation {
     String getLocaleName();
     String getOrdinalLocaleName();
 }

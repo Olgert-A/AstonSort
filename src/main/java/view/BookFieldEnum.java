@@ -1,6 +1,6 @@
 package view;
 
-public enum BookFieldEnum implements ViewRepresentationEnum {
+public enum BookFieldEnum implements ViewRepresentation {
     AUTHOR("Автор"),
     TITLE("Название книги"),
     PAGES("Количество страниц"),

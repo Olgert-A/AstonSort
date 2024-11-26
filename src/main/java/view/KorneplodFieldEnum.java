@@ -1,6 +1,6 @@
 package view;
 
-public enum KorneplodFieldEnum implements ViewRepresentationEnum {
+public enum KorneplodFieldEnum implements ViewRepresentation {
     TYPE("Тип корнеплода"),
     WEIGHT("Вес"),
     COLOR("Цвет"),

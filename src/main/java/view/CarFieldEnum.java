@@ -1,6 +1,6 @@
 package view;
 
-public enum CarFieldEnum implements ViewRepresentationEnum {
+public enum CarFieldEnum implements ViewRepresentation {
     MODEL("Модель"),
     POWER("Мощность"),
     YEAR("Год выпуска"),

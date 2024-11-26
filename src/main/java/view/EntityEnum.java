@@ -1,6 +1,6 @@
 package view;
 
-public enum EntityEnum implements ViewRepresentationEnum {
+public enum EntityEnum implements ViewRepresentation {
     CAR("Машина"),
     BOOK("Книга"),
     KORNEPLOD("Корнеплод");
