@@ -37,7 +37,7 @@ public class ConsoleUtil {
 
         for(int attempt=0; attempt<readAttempts; attempt++) {
             System.out.println(requestText);
-            String line = scanner.nextLine();;
+            String line = scanner.nextLine();
 
             try {
                 if(cls.isAssignableFrom(Integer.class))

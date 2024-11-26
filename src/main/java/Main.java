@@ -62,7 +62,7 @@ public class Main {
             userChoise = getValue(Integer.class, getInputTypeRequestText(),
                     v -> v>=0 && v<3, "Значение должно быть от 0 до 2");
 
-            boolean isDataCollected = false;
+            boolean isDataCollected;
             switch (userChoise) {
                 case 0 -> isDataCollected = strategy.collectInputData(dataAmount);
                 case 1 -> isDataCollected = strategy.collectRandomData(dataAmount);
@@ -76,6 +76,7 @@ public class Main {
                     }
                 }
                 case null, default -> {
+                    isDataCollected = false;
                     System.out.println("Не удалось выбрать тип данных, сессия будет перезапущена!");
                     continue;
                 }
