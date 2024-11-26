@@ -67,6 +67,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                         .setPages(parsedPages.get(i))
                         .build());
             }
+            return true;
         }
         catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -79,12 +80,34 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     public boolean saveResultsToFile(String name) {
         try (FileWriter fileWriter = new FileWriter(name)) {
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            FileReader fileReader = new FileReader(name);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
                 System.out.println("Нечего записывать в файл.");
                 return false;
             }
-
-           // if (fileWriter.)
+            String line = bufferedReader.readLine();
+            if (line == null) {
+                bufferedReader.close();
+                bufferedWriter.write("Books");
+                bufferedWriter.newLine();
+            }
+            bufferedReader.close();
+            List<Book> booksList = processedData;
+            for (Book book:booksList) {
+                bufferedWriter.write("[Author: ");
+                bufferedWriter.write(book.getAuthor());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Title: ");
+                bufferedWriter.write(book.getTitle());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Pages: ");
+                bufferedWriter.write(String.valueOf(book.getPages()));
+                bufferedWriter.write("]");
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+            return true;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -111,10 +134,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     }
 
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         String fileName = "C:\\Users\\reeze\\IdeaProjects\\newAstonProject\\input.txt";
         BookStrategy bookStrategy = new BookStrategy();
         bookStrategy.collectDataFromFile(fileName, 3);
         System.out.println(bookStrategy.rawData);
-    }
+        bookStrategy.saveResultsToFile("example.txt");
+
+    }*/
 }
