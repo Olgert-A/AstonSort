@@ -13,7 +13,7 @@ public class Main {
     public static String getDataTypeRequestText() {
         StringBuilder requestTextBuilder = new StringBuilder("Введите тип данных:");
         for(var dataType : EntityEnum.values())
-            requestTextBuilder.append("\n").append(dataType.getRepresentation());
+            requestTextBuilder.append("\n").append(dataType.getOrdinalLocaleName());
         return requestTextBuilder.toString();
     }
 

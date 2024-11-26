@@ -17,7 +17,7 @@ public enum EntityEnum implements ViewRepresentationEnum {
     }
 
     @Override
-    public String getRepresentation() {
+    public String getOrdinalLocaleName() {
         return this.ordinal() +
                 " - " +
                 this.localeName;

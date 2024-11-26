@@ -18,7 +18,7 @@ public enum KorneplodFieldEnum implements ViewRepresentationEnum {
     }
 
     @Override
-    public String getRepresentation() {
+    public String getOrdinalLocaleName() {
         return this.ordinal() +
                 " - " +
                 this.localeName;
