@@ -24,28 +24,29 @@ public class MergeSort<T> implements SortAlgorithm<T> {
     private List<T> merge(List<T> a, List<T> b, Comparator<T> comparator) {
         int pA = 0;
         int pB = 0;
-        int size = a.size() + b.size();
-        int k = 0;
+        int al = a.size();
+        int bl = b.size();
         List<T> res = new ArrayList<>();
 
-        while (size > k + 1) {
-            if (pA < a.size() && pB < b.size()) {
-                if (comparator.compare(a.get(pA), b.get(pB)) == 0) {
-                    res.add(a.get(pA++));
-                    res.add(b.get(pB++));
-                }
-                if (comparator.compare(a.get(pA), b.get(pB)) > 0) {
-                    res.add(a.get(pA++));
-                } else res.add(b.get(pB++));
+        while (pA < al && pB < bl) {
+            T e1 = a.get(pA);
+            T e2 = b.get(pB);
+            int compare = comparator.compare(e1, e2);
+            if (compare == 0) {
+                res.add(a.get(pA++));
+                res.add(b.get(pB++));
+                continue;
             }
-            k++;
+            if (compare > 0) {
+                res.add(a.get(pA++));
+            } else res.add(b.get(pB++));
         }
 
-        while (pA < a.size()) {
+        while (pA < al) {
             res.add(a.get(pA++));
         }
 
-        while (pB < b.size()) {
+        while (pB < bl) {
             res.add(b.get(pB++));
         }
 
