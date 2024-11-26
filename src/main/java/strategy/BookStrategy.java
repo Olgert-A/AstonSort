@@ -10,7 +10,57 @@ import static view.ConsoleUtil.getValue;
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     @Override
     public boolean collectInputData(int amount) {
-        return false;
+        int booksCount = 0;
+
+        do {
+            String author, title;
+            int pages;
+            String strUserInput;
+            Integer intUserInput;
+
+            System.out.println("\nЗаполните книгу №" + booksCount);
+
+            strUserInput = getValue(String.class, BookFieldEnum.AUTHOR.getLocaleName(),
+                    Objects::nonNull, "Автор неверный");
+
+            if(strUserInput == null) {
+                System.out.println("Не удалось считать автора, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                author = strUserInput;
+
+            strUserInput = getValue(String.class, BookFieldEnum.TITLE.getLocaleName(),
+                    Objects::nonNull, "Название неверное");
+
+            if(strUserInput == null) {
+                System.out.println("Не удалось считать название книги, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                title = strUserInput;
+
+            intUserInput = getValue(Integer.class, BookFieldEnum.PAGES.getLocaleName(),
+                    Objects::nonNull, "Количество страниц неверное");
+
+            if (intUserInput == null) {
+                System.out.println("Не удалось считать количество страниц, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                pages = intUserInput;
+
+            Book book = new Book.BookBuilder()
+                    .setAuthor(author)
+                    .setTitle(title)
+                    .setPages(pages)
+                    .build();
+
+            this.rawData.add(book);
+            booksCount++;
+        } while (booksCount < amount);
+
+        return true;
     }
 
     @Override
