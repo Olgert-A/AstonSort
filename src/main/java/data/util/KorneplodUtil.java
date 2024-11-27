@@ -45,27 +45,24 @@ public class KorneplodUtil {
         }
     }
 
-    public static class KorneplodTypeValidator implements Validate<Korneplod> {
+    public static class KorneplodTypeValidator implements Validate<String> {
         @Override
-        public boolean isValid(Korneplod obj) {
-            return obj.getType() != null && !obj.getType().trim().isEmpty() && obj.getType().length()>=3;
-            // тип не нулевое значение и не пустая строка, символы больше или равно 3
+        public boolean isValid(String str) {
+            return str != null && !str.trim().isEmpty() && str.length()>=3;
         }
     }
 
-    public static class KorneplodWeightValidator implements Validate<Korneplod> {
+    public static class KorneplodWeightValidator implements Validate<Double> {
         @Override
-        public boolean isValid(Korneplod obj) {
-            return obj.getWeight() > 0 && obj.getWeight()<=50;
-            // вес больше 0 и меньше или равно 50
+        public boolean isValid(Double db) {
+            return db > 0 && db <= 50;
         }
     }
 
-    public static class KorneplodColorValidator implements Validate<Korneplod> {
+    public static class KorneplodColorValidator implements Validate<String> {
         @Override
-        public boolean isValid(Korneplod obj) {
-            return obj.getColor() != null && !obj.getColor().trim().isEmpty();
-            // цвет не нулевое значение и не пустая строка
+        public boolean isValid(String str) {
+            return str != null && !str.trim().isEmpty();
         }
     }
 

@@ -74,25 +74,25 @@ public class CarUtil {
         }
     }
 
-    public static class CarModelValidator implements Validate<Car> {
+    public static class CarModelValidator implements Validate<String> {
         @Override
-        public boolean isValid(Car obj) {
-            return obj.getModel()!= null && !obj.getModel().trim().isEmpty() && obj.getModel().length() >= 3;
+        public boolean isValid(String str) {
+            return str!= null && !str.trim().isEmpty() && str.length() >= 3;
         }
     }
 
-    public static class CarPowerValidator implements Validate<Car> {
+    public static class CarPowerValidator implements Validate<Integer> {
         @Override
-        public boolean isValid(Car obj) {
-            return obj.getPower() > 0 && obj.getPower() <= 1000;
+        public boolean isValid(Integer integer) {
+            return integer > 0 && integer <= 1000;
         }
     }
 
-    public static class CarProductionYearValidator implements Validate<Car> {
+    public static class CarProductionYearValidator implements Validate<Integer> {
         @Override
-        public boolean isValid(Car obj) {
+        public boolean isValid(Integer integer) {
             int currentYear = Year.now().getValue();
-            return obj.getProductionYear() >= 2000 && obj.getProductionYear() <= currentYear;
+            return integer >= 2000 && integer <= currentYear;
         }
     }
 

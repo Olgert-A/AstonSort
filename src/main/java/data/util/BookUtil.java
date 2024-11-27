@@ -52,24 +52,24 @@ public class BookUtil {
         }
     }
 
-    public static class BookAuthorValidator implements Validate<Book>{
+    public static class BookAuthorValidator implements Validate<String>{
         @Override
-        public boolean isValid(Book obj) {
-            return obj.getAuthor() != null && !obj.getAuthor().trim().isEmpty() && obj.getAuthor().length() >= 3;
+        public boolean isValid(String str) {
+            return str != null && !str.trim().isEmpty() && str.length() >= 3;
         }
     }
 
-    public static class BookTitleValidator implements Validate<Book>{
+    public static class BookTitleValidator implements Validate<String>{
         @Override
-        public boolean isValid(Book obj) {
-            return obj.getTitle() != null && !obj.getTitle().trim().isEmpty();
+        public boolean isValid(String str) {
+            return str != null && !str.trim().isEmpty();
         }
     }
 
-    public static class BookPagesValidator implements Validate<Book>{
+    public static class BookPagesValidator implements Validate<Integer>{
         @Override
-        public boolean isValid(Book obj) {
-            return obj.getPages() > 0 && obj.getPages() <=3000;
+        public boolean isValid(Integer integer) {
+            return integer > 0 && integer <=3000;
         }
     }
 
