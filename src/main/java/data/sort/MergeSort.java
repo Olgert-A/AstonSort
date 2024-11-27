@@ -1,6 +1,6 @@
 package data.sort;
 
-import data.comparator.ParityChecker;
+import data.util.ParityChecker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
