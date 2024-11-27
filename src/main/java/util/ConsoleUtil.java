@@ -52,6 +52,8 @@ public class ConsoleUtil {
                 continue;
             }
 
+            if(validate == null && invalidText == null)
+                break;
 
             if(validate != null && invalidText != null)
                 if(!validate.isValid(result)) {
