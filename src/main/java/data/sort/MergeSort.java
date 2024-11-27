@@ -10,11 +10,6 @@ public class MergeSort<T> implements SortAlgorithm<T> {
 
     @Override
     public List<T> sort(List<T> data, Comparator<T> comparator) {
-        return sortEvenValues(data, comparator, null);
-    }
-
-    @Override
-    public List<T> sortEvenValues(List<T> data, Comparator<T> comparator, ParityChecker<T> parityChecker) {
         if (data == null) return new ArrayList<>();
         if (data.size() < 2) return new ArrayList<>(data);
         int mid = data.size() / 2;
@@ -23,31 +18,40 @@ public class MergeSort<T> implements SortAlgorithm<T> {
 
         left = sort(left, comparator);
         right = sort(right, comparator);
-        return merge(left, right, comparator, parityChecker);
+        return merge(left, right, comparator);
     }
 
-    private List<T> merge(List<T> left, List<T> right, Comparator<T> comparator, ParityChecker<T> parityChecker) {
+    @Override
+    public List<T> sortEvenValues(List<T> data, Comparator<T> comparator, ParityChecker<T> parityChecker) {
+        List<Integer> evenPosition = new ArrayList<>();
+        List<T> elemsToSort = new ArrayList<>();
+        List<T> result = new ArrayList<>(data);
+
+        data.forEach(elem -> {
+            if (parityChecker.isEven(elem)) {
+                elemsToSort.add(elem);
+                evenPosition.add(data.indexOf(elem));
+            }
+        });
+
+        List<T> sorted = sort(elemsToSort, comparator);
+
+        for (int i = 0; i < evenPosition.size(); i++) {
+            result.set(evenPosition.get(i), sorted.get(i));
+        }
+        return result;
+    }
+
+    private List<T> merge(List<T> left, List<T> right, Comparator<T> comparator) {
         int leftPointer = 0;
         int rightPointer = 0;
         int leftLen = left.size();
         int rightLen = right.size();
-        boolean parityCheckerFlag = parityChecker != null;
         List<T> res = new ArrayList<>();
-        List<T> resImposter = new ArrayList<>();
 
         while (leftPointer < leftLen && rightPointer < rightLen) {
             T e1 = left.get(leftPointer);
             T e2 = right.get(rightPointer);
-            if (parityCheckerFlag) {
-                if (!parityChecker.isEven(e1)) {
-                    res.set(leftPointer++, e1);
-                    e1 = left.get(leftPointer);
-                }
-                if (!parityChecker.isEven(e2)) {
-                    resImposter.set(rightPointer++, e2);
-                    e2 = right.get(rightPointer);
-                }
-            }
             int compare = comparator.compare(e1, e2);
             if (compare == 0) {
                 res.add(e1);
@@ -56,7 +60,7 @@ public class MergeSort<T> implements SortAlgorithm<T> {
                 rightPointer++;
                 continue;
             }
-            if (compare > 0) {
+            if (compare < 0) {
                 res.add(e1);
                 leftPointer++;
             } else {
@@ -64,8 +68,6 @@ public class MergeSort<T> implements SortAlgorithm<T> {
                 rightPointer++;
             }
         }
-
-        res.addAll(resImposter);
 
         while (leftPointer < leftLen) {
             res.add(left.get(leftPointer++));
