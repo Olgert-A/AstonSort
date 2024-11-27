@@ -1,6 +1,8 @@
-package view;
+package util.enums;
 
-public enum BookFieldEnum implements ViewRepresentationEnum {
+import util.ViewRepresentation;
+
+public enum BookFieldEnum implements ViewRepresentation {
     AUTHOR("Автор"),
     TITLE("Название книги"),
     PAGES("Количество страниц"),
@@ -18,7 +20,7 @@ public enum BookFieldEnum implements ViewRepresentationEnum {
     }
 
     @Override
-    public String getRepresentation() {
+    public String getOrdinalLocaleName() {
         return this.ordinal() +
                 " - " +
                 this.localeName;
