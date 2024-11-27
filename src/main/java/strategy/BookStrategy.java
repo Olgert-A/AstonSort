@@ -1,6 +1,7 @@
 package strategy;
 
 import data.entities.Book;
+import data.validate.BookValidator;
 import view.ViewRepresentationEnum;
 
 import java.io.*;
@@ -20,8 +21,8 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean collectDataFromFile(String name, int amount) {
-        try (FileReader fileReader = new FileReader(name)) {
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+        try (FileReader fileReader = new FileReader(name);
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             String line;
             line = bufferedReader.readLine();
             if (!(line.equals("Books"))) {
@@ -33,20 +34,42 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             List<String> parsedTitle = new ArrayList<>();
             List <Integer> parsedPages = new ArrayList<>();
             int counter = 0;
+            BookValidator bookValidator = new BookValidator() {
+                @Override
+                public boolean isAuthorValid(String author) {
+                    return author.length() > 5;
+                }
+
+                @Override
+                public boolean isTitleValid(String title) {
+                    return title.length() > 3;
+                }
+
+                @Override
+                public boolean isPagesValid(int pages) {
+                    return pages > 1;
+                }
+            };
             while((line = bufferedReader.readLine()) != null && counter < amount) {
                 String[] splitLine = line.split(":");
-                if (line.startsWith("[Author")) {
-                    parsedName.add(splitLine[1].trim());
-                } else if (line.startsWith("Title")) {
-                    parsedTitle.add(splitLine[1].trim());
-                } else if (line.startsWith("Pages")) {
-                    if (splitLine[1].endsWith("]")) {
-                        String intLine = splitLine[1].substring(0, splitLine[1].length()-1).trim();
-                        parsedPages.add(Integer.valueOf(intLine,10));
-                        counter++;
+                switch (splitLine[0]) {
+                    case "[Author" -> {
+                        if (bookValidator.isAuthorValid(splitLine[1].trim()))
+                        parsedName.add(splitLine[1].trim());
+                        break;
                     }
-                } else {
-                    continue;}
+                    case "Title" -> {
+                        if (bookValidator.isTitleValid(splitLine[1].trim()))
+                            parsedTitle.add(splitLine[1].trim());
+                        break;                        }
+                    case "Pages" -> {
+                        String intLine = splitLine[1].substring(0, splitLine[1].length() - 1).trim();
+                        if (bookValidator.isPagesValid(Integer.valueOf(intLine, 10))) {
+                            parsedPages.add(Integer.valueOf(intLine, 10));
+                            counter++;}
+                        break;
+                    }
+                }
             }
 
             if (counter < amount) {
@@ -55,12 +78,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             }
             bufferedReader.close();
             for(int i = 0; i < amount; i++) {
-                //BookValidatorImpl bvi = new BookValidatorImpl();
-                // if (!(bvi.isAuthorValid(parsedName.get(i)){
-                    //System.out.println("Invalid author name");
-                    //continue;}
-                    //else if (!(... и так далее
-
                 Book.BookBuilder bookBuilder = new Book.BookBuilder();
                 rawData.add(bookBuilder.setAuthor(parsedName.get(i))
                         .setTitle(parsedTitle.get(i))
@@ -78,8 +95,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name)) {
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        try (FileWriter fileWriter = new FileWriter(name);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
             FileReader fileReader = new FileReader(name);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
@@ -133,7 +151,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     public void showResultsData() {
 
     }
-
 /*    public static void main(String[] args) {
         String fileName = "C:\\Users\\reeze\\IdeaProjects\\newAstonProject\\input.txt";
         BookStrategy bookStrategy = new BookStrategy();
