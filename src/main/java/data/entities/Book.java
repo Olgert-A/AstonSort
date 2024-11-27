@@ -2,7 +2,7 @@ package data.entities;
 
 import java.util.Objects;
 
-public class Book {
+public class Book  {
     private final String author;
     private final String title;
     private final int pages;

@@ -12,5 +12,5 @@ public interface Strategy {
 
     void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven);
     void sortByAllFields(boolean sortOnlyEven);
-    void searchByField(ViewRepresentationEnum field, Number fieldValue);
+     <T> void searchByField(ViewRepresentationEnum field, T fieldValue);
 }
