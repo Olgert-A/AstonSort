@@ -79,6 +79,11 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
+    public void showCollectedData() {
+
+    }
+
+    @Override
     public boolean sort() {
         return false;
     }

@@ -79,6 +79,11 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
+    public void showCollectedData() {
+
+    }
+
+    @Override
     public boolean sort() {
         return false;
     }

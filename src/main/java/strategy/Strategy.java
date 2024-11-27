@@ -6,6 +6,7 @@ public interface Strategy {
     boolean collectDataFromFile(String name, int amount);
 
     boolean saveResultsToFile(String name);
+    void showCollectedData();
     void showResults();
 
     boolean sort();
