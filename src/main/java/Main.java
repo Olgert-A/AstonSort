@@ -18,8 +18,7 @@ public class Main {
     }
 
     public static String getInputTypeRequestText() {
-        return """
-                
+        return """             
                 Введите способ ввода данных:
                 0 - Ручной ввод
                 1 - Случайное заполнение
@@ -49,7 +48,7 @@ public class Main {
                 }
             }
 
-            userChoise = getValue(Integer.class, "\nВведите размер массива данных:",
+            userChoise = getValue(Integer.class, "Введите размер массива данных:",
                     v -> v > 2, DATA_SIZE_INVALID_TEXT);
 
             if(userChoise == null) {
@@ -87,39 +86,56 @@ public class Main {
                 continue;
             }
 
+            strategy.showCollectedData();
+
             boolean continueWorkWithData = true;
             do {
                 if(strategy.sort()) {
                     strategy.showResults();
-                    String fileName = getValue(String.class, "Введите имя файла для сохранения",
-                            s -> !s.isEmpty(), "Ошибка: Имя файла должно содержать хотя бы 1 символ");
 
-                    if(fileName == null)
-                        System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
-                    else
-                        strategy.saveResultsToFile(fileName);
+                    String userChoice = getValue(String.class, "Сохранить в файл? (y,n)");
+
+                    if(userChoice != null && userChoice.equals("Y")) {
+                        String fileName = getValue(String.class, "Введите имя файла для сохранения",
+                                s -> !s.isEmpty(), "Ошибка: Имя файла должно содержать хотя бы 1 символ");
+
+                        if (fileName != null)
+                            if (strategy.saveResultsToFile(fileName))
+                                System.out.println("Сохранение успешно завершено!");
+                            else
+                                System.out.println("Не удалось сохранить в файл");
+                        else
+                            System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
+                    }
                 }
 
                 if(strategy.search()) {
                     strategy.showResults();
-                    String fileName = getValue(String.class, "Введите имя файла для сохранения",
-                            s -> !s.isEmpty(), "Ошибка: Имя файла должно содержать хотя бы 1 символ");
 
-                    if(fileName == null)
-                        System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
-                    else
-                        strategy.saveResultsToFile(fileName);
+                    String userChoice = getValue(String.class, "Сохранить в файл? (y,n)");
+
+                    if (userChoice != null && userChoice.equals("Y")) {
+                        String fileName = getValue(String.class, "Введите имя файла для сохранения",
+                                s -> !s.isEmpty(), "Ошибка: Имя файла должно содержать хотя бы 1 символ");
+
+                        if (fileName != null)
+                            if (strategy.saveResultsToFile(fileName))
+                                System.out.println("Сохранение успешно завершено!");
+                            else
+                                System.out.println("Не удалось сохранить в файл");
+                        else
+                            System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
+                    }
                 }
 
-                String userAnswer = getValue(String.class, "Продолжить работать с данными? (Y/N)");
-                if(userAnswer == null || !userAnswer.equals("Y"))
-                    continueWorkWithData = false;
+                String userAnswer = getValue(String.class, "Продолжить работать с данными? (y/n)");
+                continueWorkWithData = userAnswer != null && userAnswer.equals("y");
 
             } while (continueWorkWithData);
 
-            String userAnswer = getValue(String.class, "Запустить сессию заново? (Y/N");
-            if(userAnswer == null || !userAnswer.equals("Y"))
-                createNewSession = false;
+            String userAnswer = getValue(String.class, "Запустить сессию заново? (y/n)");
+            createNewSession = userAnswer != null && userAnswer.equals("y");
+
         } while (createNewSession);
     }
 }
