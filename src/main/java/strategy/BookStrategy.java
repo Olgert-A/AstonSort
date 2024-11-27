@@ -74,8 +74,8 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
     @Override
-    public void saveResultsToFile(String name) {
-
+    public boolean saveResultsToFile(String name) {
+        return false;
     }
 
     @Override

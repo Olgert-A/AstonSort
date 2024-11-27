@@ -19,8 +19,8 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
-    public void saveResultsToFile(String name) {
-
+    public boolean saveResultsToFile(String name) {
+        return false;
     }
 
     @Override

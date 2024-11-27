@@ -5,7 +5,7 @@ public interface Strategy {
     boolean collectRandomData(int amount);
     boolean collectDataFromFile(String name, int amount);
 
-    void saveResultsToFile(String name);
+    boolean saveResultsToFile(String name);
     void showResults();
 
     boolean sort();
