@@ -1,11 +1,66 @@
 package strategy;
 
 import data.entities.Korneplod;
+import util.enums.KorneplodFieldEnum;
+
+import java.util.Objects;
+
+import static util.ConsoleUtil.getValue;
 
 public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
     @Override
     public boolean collectInputData(int amount) {
-        return false;
+        int korneplodCount = 0;
+
+        do {
+            String type, color;
+            double weight;
+            String strUserInput;
+            Double doubleUserInput;
+
+            System.out.println("\nЗаполните кореплод №" + korneplodCount);
+
+            strUserInput = getValue(String.class, KorneplodFieldEnum.TYPE.getLocaleName(),
+                    Objects::nonNull, "Тип неверный");
+
+            if(strUserInput == null) {
+                System.out.println("Не удалось считать тип, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                type = strUserInput;
+
+            doubleUserInput = getValue(Double.class, KorneplodFieldEnum.WEIGHT.getLocaleName(),
+                    Objects::nonNull, "Вес неверный");
+
+            if(doubleUserInput == null) {
+                System.out.println("Не удалось считать вес, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                weight = doubleUserInput;
+
+            strUserInput = getValue(String.class, KorneplodFieldEnum.COLOR.getLocaleName(),
+                    Objects::nonNull, "цвет неверный");
+
+            if (strUserInput == null) {
+                System.out.println("Не удалось считать цвет, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                color = strUserInput;
+
+            Korneplod korneplod = new Korneplod.KorneplodBuilder()
+                    .setType(type)
+                    .setWeight(weight)
+                    .setColor(color)
+                    .build();
+
+            this.rawData.add(korneplod);
+            korneplodCount++;
+        } while (korneplodCount < amount);
+
+        return true;
     }
 
     @Override
