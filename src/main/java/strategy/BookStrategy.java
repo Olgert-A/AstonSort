@@ -2,6 +2,7 @@ package strategy;
 
 import data.entities.Book;
 import data.validate.BookValidator;
+import data.validate.Validator;
 import view.ViewRepresentationEnum;
 
 import java.io.*;
@@ -30,59 +31,43 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 return false;
             }
 
-            List<String> parsedName = new ArrayList<>();
-            List<String> parsedTitle = new ArrayList<>();
-            List <Integer> parsedPages = new ArrayList<>();
             int counter = 0;
-            BookValidator bookValidator = new BookValidator() {
-                @Override
-                public boolean isAuthorValid(String author) {
-                    return author.length() > 5;
-                }
-
-                @Override
-                public boolean isTitleValid(String title) {
-                    return title.length() > 3;
-                }
-
-                @Override
-                public boolean isPagesValid(int pages) {
-                    return pages > 1;
-                }
-            };
+            Validator<String> authorValidator = v -> v.length() > 5;
+            Validator<String> titleValidator = v -> v.length() > 3;
+            Validator <Integer> pagesValidator = v -> v > 1;
+            String author = null, title = null;
+            int pages = 0;
+            boolean entityFlag = false;
             while((line = bufferedReader.readLine()) != null && counter < amount) {
                 String[] splitLine = line.split(":");
                 switch (splitLine[0]) {
-                    case "[Author" -> {
-                        if (bookValidator.isAuthorValid(splitLine[1].trim()))
-                        parsedName.add(splitLine[1].trim());
-                        break;
+                    case "[Author" -> { author = splitLine[1].trim();
                     }
-                    case "Title" -> {
-                        if (bookValidator.isTitleValid(splitLine[1].trim()))
-                            parsedTitle.add(splitLine[1].trim());
-                        break;                        }
+                    case "Title" -> { title = splitLine[1].trim();
+                    }
                     case "Pages" -> {
                         String intLine = splitLine[1].substring(0, splitLine[1].length() - 1).trim();
-                        if (bookValidator.isPagesValid(Integer.valueOf(intLine, 10))) {
-                            parsedPages.add(Integer.valueOf(intLine, 10));
-                            counter++;}
-                        break;
+                            pages = Integer.valueOf(intLine, 10);
+                            entityFlag = true;
+                            counter++;
+                    }
+                }
+                if (entityFlag) {
+                    entityFlag = false;
+                    if (authorValidator.isValid(author) && titleValidator.isValid(title)
+                        && pagesValidator.isValid(pages)){
+                        Book book = new Book.BookBuilder()
+                                .setAuthor(author)
+                                .setTitle(title)
+                                .setPages(pages)
+                                .build();
+                        rawData.add(book);
                     }
                 }
             }
-
+            bufferedReader.close();
             if (counter < amount) {
                 System.out.println("Файл закончился раньше, чем массив заполнился");
-                amount = counter;
-            }
-            bufferedReader.close();
-            for(int i = 0; i < amount; i++) {
-                Book.BookBuilder bookBuilder = new Book.BookBuilder();
-                rawData.add(bookBuilder.setAuthor(parsedName.get(i))
-                        .setTitle(parsedTitle.get(i))
-                        .setPages(parsedPages.get(i))
-                        .build());
             }
             return true;
         }
@@ -120,7 +105,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 bufferedWriter.write(book.getTitle());
                 bufferedWriter.newLine();
                 bufferedWriter.write("Pages: ");
-                bufferedWriter.write(String.valueOf(book.getPages()));
+                bufferedWriter.write(book.getPages());
                 bufferedWriter.write("]");
                 bufferedWriter.newLine();
             }
