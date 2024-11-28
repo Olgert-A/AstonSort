@@ -2,6 +2,7 @@ package strategy;
 
 import data.entities.Korneplod;
 import util.enums.KorneplodFieldEnum;
+import util.enums.SortTypeEnum;
 
 import java.util.Objects;
 
@@ -84,7 +85,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
-    public boolean sort() {
+    public boolean sort(SortTypeEnum sortType) {
         return false;
     }
 

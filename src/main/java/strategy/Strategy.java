@@ -1,5 +1,7 @@
 package strategy;
 
+import util.enums.SortTypeEnum;
+
 public interface Strategy {
     boolean collectInputData(int amount);
     boolean collectRandomData(int amount);
@@ -9,6 +11,6 @@ public interface Strategy {
     void showCollectedData();
     void showResults();
 
-    boolean sort();
+    boolean sort(SortTypeEnum sortType);
     boolean search();
 }
