@@ -2,9 +2,13 @@ package strategy;
 
 import data.entities.Korneplod;
 import data.util.ParityChecker;
+import data.util.Validate;
 import util.enums.KorneplodFieldEnum;
 import util.enums.SortTypeEnum;
 
+import java.io.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 import static util.ConsoleUtil.getSortType;

@@ -1,6 +1,7 @@
 package strategy;
 
 import data.entities.Book;
+import data.util.ParityChecker;
 import data.util.Validate;
 import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;

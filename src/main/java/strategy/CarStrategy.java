@@ -1,8 +1,15 @@
 package strategy;
 
 import data.entities.Car;
+import data.util.ParityChecker;
+import data.util.Validate;
 import util.enums.CarFieldEnum;
+import util.enums.SortTypeEnum;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Comparator;
 import java.util.Objects;
 
 import static util.ConsoleUtil.getValue;
