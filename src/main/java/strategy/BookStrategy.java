@@ -1,9 +1,11 @@
 package strategy;
 
 import data.entities.Book;
-import data.validate.BookValidator;
-import data.validate.Validator;
-import view.ViewRepresentationEnum;
+import util.enums.BookFieldEnum;
+
+import java.util.Objects;
+
+import static util.ConsoleUtil.getValue;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,13 +13,64 @@ import java.util.List;
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     @Override
-    public void collectInputData(int amount) {
+    public boolean collectInputData(int amount) {
+        int booksCount = 0;
 
+        do {
+            String author, title;
+            int pages;
+            String strUserInput;
+            Integer intUserInput;
+
+            System.out.println("\nЗаполните книгу №" + booksCount);
+
+            strUserInput = getValue(String.class, BookFieldEnum.AUTHOR.getLocaleName(),
+                    Objects::nonNull, "Автор неверный");
+
+            if(strUserInput == null) {
+                System.out.println("Не удалось считать автора, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                author = strUserInput;
+
+            strUserInput = getValue(String.class, BookFieldEnum.TITLE.getLocaleName(),
+                    Objects::nonNull, "Название неверное");
+
+            if(strUserInput == null) {
+                System.out.println("Не удалось считать название книги, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                title = strUserInput;
+
+            intUserInput = getValue(Integer.class, BookFieldEnum.PAGES.getLocaleName(),
+                    Objects::nonNull, "Количество страниц неверное");
+
+            if (intUserInput == null) {
+                System.out.println("Не удалось считать количество страниц, ввод объекта будет пропущен");
+                continue;
+            }
+            else
+                pages = intUserInput;
+
+            Book book = new Book.BookBuilder()
+                    .setAuthor(author)
+                    .setTitle(title)
+                    .setPages(pages)
+                    .build();
+
+            this.rawData.add(book);
+            booksCount++;
+        } while (booksCount < amount);
+
+        return true;
     }
 
     @Override
-    public void collectRandomData(int amount) {
+    public boolean collectRandomData(int amount) {
 
+        return true;
     }
 
     @Override
@@ -144,30 +197,28 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
     @Override
-    public void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven) {
-
+    public void showCollectedData() {
+        System.out.println("Исходные данные:");
+        for(var book : this.rawData)
+            System.out.println(book);
     }
 
     @Override
-    public void sortByAllFields(boolean sortOnlyEven) {
+    public boolean sort() {
 
+        return false;
     }
 
     @Override
-    public void searchByField(ViewRepresentationEnum field, Number fieldValue) {
+    public boolean search() {
 
+        return false;
     }
 
     @Override
-    public void showResultsData() {
-
-    }
-    public static void main(String[] args) {
-        String fileName = "C:\\Users\\reeze\\IdeaProjects\\newAstonProject\\input.txt";
-        BookStrategy bookStrategy = new BookStrategy();
-        bookStrategy.collectDataFromFile(fileName, 4);
-        System.out.println(bookStrategy.rawData);
-        bookStrategy.saveResultsToFile("example.txt");
-
+    public void showResults() {
+        System.out.println("Результат:");
+        for(var book : this.processedData)
+            System.out.println(book);
     }
 }

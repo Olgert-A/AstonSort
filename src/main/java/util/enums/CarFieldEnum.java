@@ -1,33 +1,37 @@
-package view;
+package util.enums;
 
-public enum KorneplodFieldEnum implements ViewRepresentationEnum {
-    TYPE("Тип корнеплода"),
-    WEIGHT("Вес"),
-    COLOR("Цвет"),
+import util.ViewRepresentation;
+
+public enum CarFieldEnum implements ViewRepresentation {
+    MODEL("Модель"),
+    POWER("Мощность"),
+    YEAR("Год выпуска"),
     ALL("Все поля");
 
     private final String localeName;
 
-    KorneplodFieldEnum(String localeName) {
+    CarFieldEnum(String localeName) {
         this.localeName = localeName;
     }
 
-    @Override
     public String getLocaleName() {
         return localeName;
     }
 
     @Override
-    public String getRepresentation() {
+    public String getOrdinalLocaleName() {
         return this.ordinal() +
                 " - " +
                 this.localeName;
     }
 
+
     @Override
     public String toString() {
-        return "KorneplodFieldEnum{" +
+        return "CarFieldEnumerator{" +
                 "localeName='" + localeName + '\'' +
                 '}';
     }
+
+
 }
