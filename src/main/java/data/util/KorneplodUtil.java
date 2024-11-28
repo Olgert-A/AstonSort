@@ -7,7 +7,7 @@ import java.util.Comparator;
 public class KorneplodUtil {
 
     public static final String TYPE_INVALID_TEXT = "Тип корнеплода не нулевое значение и не пустая строка, символы должны быть больше или равно 3";
-    public static final String WEIGHT_INVALID_TEXT = "Вес должен быть больше 0 и меньше или равен 50";
+    public static final String WEIGHT_INVALID_TEXT = "Вес должен быть больше 0 и меньше или равен 10";
     public static final String COLOR_INVALID_TEXT = "Цвет корнеплода не нулевое значение и не пустая строка";
 
     public static class KorneplodColorComparator implements Comparator<Korneplod> {
@@ -58,7 +58,7 @@ public class KorneplodUtil {
     public static class KorneplodWeightValidator implements Validate<Double> {
         @Override
         public boolean isValid(Double db) {
-            return db > 0 && db <= 50;
+            return db > 0 && db <= 10;
         }
     }
 
