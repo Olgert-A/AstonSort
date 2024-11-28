@@ -1,6 +1,7 @@
 package strategy;
 
 import data.entities.Korneplod;
+import data.util.KorneplodUtil;
 import data.util.ParityChecker;
 import data.util.Validate;
 import util.enums.KorneplodFieldEnum;
@@ -203,7 +204,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     public boolean sort(SortTypeEnum sortType) {
         try {
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
-            SortTypeEnum sortType = getSortType();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (Exception e) {
            throw new RuntimeException(e.getMessage());
@@ -214,17 +214,16 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     private Comparator<Korneplod> getFieldComparator(KorneplodFieldEnum sortField) {
         switch (sortField) {
             case TYPE -> {
-                return Comparator.comparing(Korneplod::getType);
+                return new KorneplodUtil.KorneplodTypeComparator();
             }
             case COLOR -> {
-                return Comparator.comparing(Korneplod::getColor);
+                return new KorneplodUtil.KorneplodColorComparator();
             }
             case WEIGHT -> {
-                return Comparator.comparing(Korneplod::getWeight);
+                return new KorneplodUtil.KorneplodWeightComparator();
             }
             case ALL -> {
-                return Comparator.comparing(Korneplod::getType)
-                        .thenComparing(Korneplod::getColor).thenComparing(Korneplod::getWeight);
+                return new KorneplodUtil.KorneplodGeneralComparator();
             }
         }
         return null;
@@ -232,7 +231,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
     private ParityChecker<Korneplod> getFieldParityChecker(KorneplodFieldEnum sortField) {
         if (sortField.equals(KorneplodFieldEnum.WEIGHT)) {
-            return obj -> obj.getWeight() % 2 == 0;
+            return new KorneplodUtil();
         }
         return null;
     }

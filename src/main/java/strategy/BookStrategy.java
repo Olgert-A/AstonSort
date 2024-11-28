@@ -1,6 +1,7 @@
 package strategy;
 
 import data.entities.Book;
+import data.util.BookUtil;
 import data.util.ParityChecker;
 import data.util.Validate;
 import util.enums.BookFieldEnum;
@@ -219,25 +220,23 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     private Comparator<Book> getFieldComparator(BookFieldEnum sortField) {
         switch (sortField) {
             case AUTHOR -> {
-                return Comparator.comparing(Book::getAuthor);
+                return new BookUtil.BookAuthorComparator();
             }
             case TITLE -> {
-                return Comparator.comparing(Book::getTitle);
+                return new BookUtil.BookTitleComparator();
             }
             case PAGES -> {
-                return Comparator.comparing(Book::getPages);
-
+                return new BookUtil.BookPagesComparator();
             }
             case ALL -> {
-                return Comparator.comparing(Book::getAuthor)
-                        .thenComparing(Book::getTitle).thenComparing(Book::getPages);
+                return new BookUtil.BookGeneralComparator();
             }
         }
         return null;
     }
 
     private ParityChecker<Book> getFieldParityChecker(BookFieldEnum sortField) {
-        if (sortField.equals(BookFieldEnum.PAGES)) return obj -> obj.getPages() % 2 == 0;
+        if (sortField.equals(BookFieldEnum.PAGES)) return new BookUtil.BookPagesParityCheker();
         return null;
     }
 

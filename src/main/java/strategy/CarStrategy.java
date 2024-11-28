@@ -1,6 +1,7 @@
 package strategy;
 
 import data.entities.Car;
+import data.util.CarUtil;
 import data.util.ParityChecker;
 import data.util.Validate;
 import util.enums.CarFieldEnum;
@@ -176,17 +177,16 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     private Comparator<Car> getFieldComparator(CarFieldEnum sortField) {
         switch (sortField) {
             case MODEL -> {
-                return Comparator.comparing(Car::getModel);
+                return new CarUtil.CarModelComparator();
             }
             case YEAR -> {
-                return Comparator.comparing(Car::getProductionYear);
+                return new CarUtil.CarYearComparator();
             }
             case POWER -> {
-                return Comparator.comparing(Car::getPower);
+                return new CarUtil.CarPowerComparator();
             }
             case ALL -> {
-                return Comparator.comparing(Car::getProductionYear)
-                        .thenComparing(Car::getModel).thenComparing(Car::getPower);
+                return new CarUtil.CarGeneralComparator();
             }
         }
         return null;
@@ -195,10 +195,10 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     private ParityChecker<Car> getFieldParityChecker(CarFieldEnum sortField) {
         switch (sortField) {
             case YEAR -> {
-                return obj -> obj.getProductionYear() % 2 == 0;
+                return new CarUtil.CarProductionYearParityCheker();
             }
             case POWER -> {
-                return obj -> obj.getPower() % 2 == 0;
+                return new CarUtil.CarPowerParityCheker();
             }
         }
         return null;
