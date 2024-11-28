@@ -4,7 +4,8 @@ import util.ViewRepresentation;
 
 public enum SortTypeEnum implements ViewRepresentation {
     SORT("Обычная"),
-    SORTEVEN("Сортировка чётных значений");
+    SORTEVENVALUES("Сортировка четных полей");
+
 
     private final String localeName;
 
@@ -14,7 +15,8 @@ public enum SortTypeEnum implements ViewRepresentation {
 
     @Override
     public String getLocaleName() {
-        return localeName;
+        return this.localeName;
+
     }
 
     @Override
@@ -22,5 +24,13 @@ public enum SortTypeEnum implements ViewRepresentation {
         return this.ordinal() +
                 " - " +
                 this.localeName;
+    }
+
+
+    @Override
+    public String toString() {
+        return "SearchTypeEnum{" +
+                "localeName='" + localeName + '\'' +
+                '}';
     }
 }

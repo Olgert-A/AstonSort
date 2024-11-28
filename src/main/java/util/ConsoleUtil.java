@@ -1,9 +1,12 @@
 package util;
 
 import data.util.Validate;
+
+import util.enums.CarFieldEnum;
 import util.enums.DataProcessEnum;
 import util.enums.EntityEnum;
 import util.enums.InputTypeEnum;
+
 import util.enums.SortTypeEnum;
 
 import java.io.IOException;
@@ -132,6 +135,24 @@ public class ConsoleUtil {
         }
 
         return userChoice == 0;
+    }
+
+    public static SortTypeEnum getSortType() throws Exception {
+        SortTypeEnum sortType;
+        StringBuilder requestTextBuilder = new StringBuilder("\nВыберите тип сортировки:");
+        int fieldAmount = CarFieldEnum.values().length;
+
+        for (var field : CarFieldEnum.values())
+            requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
+
+        Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(), v -> v >= 0 && v < fieldAmount,"Значение должно быть от 0 до " + (fieldAmount - 1));
+
+        if (intUserInput == null) {
+            System.out.println("Не удалось выбрать тип сортировки, операция будет прервана!");
+            throw new Exception("ConsoleUtil.getSortType()");
+        } else
+            sortType = SortTypeEnum.values()[intUserInput];
+        return sortType;
     }
 
     @SuppressWarnings("unckecked")

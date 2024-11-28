@@ -1,11 +1,14 @@
 package strategy;
 
 import data.entities.Car;
+import data.util.ParityChecker;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
 
+import java.util.Comparator;
 import java.util.Objects;
 
+import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
 
 public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
@@ -24,11 +27,10 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             strUserInput = getValue(String.class, CarFieldEnum.MODEL.getLocaleName(),
                     Objects::nonNull, "Модель неверная");
 
-            if(strUserInput == null) {
+            if (strUserInput == null) {
                 System.out.println("Не удалось считать модель, ввод объекта будет пропущен");
                 continue;
-            }
-            else
+            } else
                 model = strUserInput;
 
             intUserInput = getValue(Integer.class, CarFieldEnum.POWER.getLocaleName(),
@@ -37,8 +39,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             if (intUserInput == null) {
                 System.out.println("Не удалось считать мощность, ввод объекта будет пропущен");
                 continue;
-            }
-            else
+            } else
                 power = intUserInput;
 
             intUserInput = getValue(Integer.class, CarFieldEnum.YEAR.getLocaleName(),
@@ -47,8 +48,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             if (intUserInput == null) {
                 System.out.println("Не удалось считать год выпуска, ввод объекта будет пропущен");
                 continue;
-            }
-            else
+            } else
                 productionYear = intUserInput;
 
             Car car = new Car.CarBuilder()
@@ -86,7 +86,44 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
     @Override
     public boolean sort(SortTypeEnum sortType) {
-        return false;
+        try {
+            CarFieldEnum sortField = ConsoleUtil.getSortField();
+            sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return true;
+    }
+
+    private Comparator<Car> getFieldComparator(CarFieldEnum sortField) {
+        switch (sortField) {
+            case MODEL -> {
+                return Comparator.comparing(Car::getModel);
+            }
+            case YEAR -> {
+                return Comparator.comparing(Car::getProductionYear);
+            }
+            case POWER -> {
+                return Comparator.comparing(Car::getPower);
+            }
+            case ALL -> {
+                return Comparator.comparing(Car::getProductionYear)
+                        .thenComparing(Car::getModel).thenComparing(Car::getPower);
+            }
+        }
+        return null;
+    }
+
+    private ParityChecker<Car> getFieldParityChecker(CarFieldEnum sortField) {
+        switch (sortField) {
+            case YEAR -> {
+                return obj -> obj.getProductionYear() % 2 == 0;
+            }
+            case POWER -> {
+                return obj -> obj.getPower() % 2 == 0;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -97,5 +134,26 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
     public void showResults() {
 
+    }
+
+    private static class ConsoleUtil {
+        public static CarFieldEnum getSortField() throws Exception {
+            CarFieldEnum sortField;
+            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
+            int fieldAmount = CarFieldEnum.values().length;
+
+            for (var field : CarFieldEnum.values())
+                requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
+
+            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
+
+            if (intUserInput == null) {
+                System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
+                throw new Exception("return false");
+            } else
+                sortField = CarFieldEnum.values()[intUserInput];
+            return sortField;
+        }
     }
 }
