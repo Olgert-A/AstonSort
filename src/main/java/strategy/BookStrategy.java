@@ -6,6 +6,8 @@ import view.BookFieldEnum;
 import view.ViewRepresentationEnum;
 
 import java.util.Comparator;
+import java.util.List;
+
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     private BinarySearch<Book> binarySearch = new BinarySearch<>();
@@ -82,10 +84,114 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             return;
         }
 
+
     }
+    @Override
+    public boolean search (){
+        BookFieldEnum searchField = BookConsoleUtil.getSearchField();
+
+        if (searchField == null){
+            System.out.println("No search field found");
+            return false;
+        }
+        Book searchValue =  getSearchValue(searchField);
+        if (searchValue != null){
+            System.out.println( "что-то пошло не так");
+            return false;
+        }
+        Comparator <Book> comparator = getFieldComparator(searchField);
+        if (comparator == null){
+
+            System.out.println("Компаратор не найден!");
+            return false;
+        }
+        List <Book>  sortedData = this.sortAlgorithm(this.rawData, comparator);
+        Book result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
+
+        if (result == null){
+            return false;
+        }
+        this.processedData.clear();
+        this.processedData.add(result);
+        return true;
+
+    }
+
+    private Comparator <Book> getFieldComparator(BookFieldEnum field) {
+
+        switch (field) {
+            case AUTHOR ->{
+                return Comparator.comparing(Book::getAuthor);
+            }
+            case TITLE ->{
+                return Comparator.comparing(Book::getTitle);
+            }
+            case PAGES ->{
+                return Comparator.comparing(Book::getPages);
+            }
+             default ->
+            {
+                return null;
+            }
+        }
+
+    }
+    private Book getSearchValue (BookFieldEnum searchField) {
+        Book.BookBuilder builder = new Book.BookBuilder();
+        switch (searchField) {
+            case AUTHOR ->{
+                String author = BookConsoleUtil.getAuthorField();
+                if (author == null) {
+                    return null;
+                }
+                return builder.setAuthor(author).build();
+            }
+            case TITLE ->{
+                String title = BookConsoleUtil.getTitleField();
+                if (title == null) {
+                    return null;
+                }
+                return builder.setTitle(title).build();
+            }
+            case PAGES ->{
+                Integer pages = BookConsoleUtil.getPagesField();
+                if (pages == null) {
+                    return null;
+                }
+                return builder.setPages(pages).build();
+            }
+            case ALL -> {
+                System.out.println("нельзя искать всё!");
+                return null;
+            }
+            default -> {
+                return null;
+            }
+        }
+
+    }
+
+
+    private List<Book> sortAlgorithm(List<Book> rawData, Comparator<Book> comparator) {
+    }
+
 
     @Override
     public void showResultsData() {
 
+    }
+    public static class BookConsoleUtil {
+        public static BookFieldEnum getSearchField(){
+            return null;
+        }
+        public static  String getAuthorField(){
+            return null;
+        }
+       public static  String getTitleField(){
+            return null;
+       }
+       public static  Integer getPagesField(){
+            return null;
+       }
     }
 }
