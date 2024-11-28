@@ -133,7 +133,7 @@ public class ConsoleUtil {
         return userChoice == 0;
     }
 
-    public static SortTypeEnum getSortType() throws Exception {
+    public static SortTypeEnum getSortType() throws IOException {
         SortTypeEnum sortType;
         StringBuilder requestTextBuilder = new StringBuilder("\nВыберите тип сортировки:");
         int fieldAmount = CarFieldEnum.values().length;
@@ -145,7 +145,7 @@ public class ConsoleUtil {
 
         if (intUserInput == null) {
             System.out.println("Не удалось выбрать тип сортировки, операция будет прервана!");
-            throw new Exception("ConsoleUtil.getSortType()");
+            throw new IOException("ConsoleUtil.getSortType()");
         } else
             sortType = SortTypeEnum.values()[intUserInput];
         return sortType;
