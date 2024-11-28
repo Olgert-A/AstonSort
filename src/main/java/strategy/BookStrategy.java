@@ -302,6 +302,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             System.out.println("Не найдено");
             return false;
         }
+        return true;
     }
 
     @Override
