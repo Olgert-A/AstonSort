@@ -26,7 +26,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
              BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             String line;
             line = bufferedReader.readLine();
-            if (!(line.equals("Books"))) {
+            if (line.isEmpty()) {
+                while (line.isEmpty()) {
+                    line = bufferedReader.readLine();
+                }
+            }
+            if (!(line.equals("Books")) || line == null) {
                 System.out.println("Invalid file");
                 return false;
             }
@@ -37,31 +42,49 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             Validator <Integer> pagesValidator = v -> v > 1;
             String author = null, title = null;
             int pages = 0;
-            boolean entityFlag = false;
+            boolean startFlag = false, endFlag = false;
+
             while((line = bufferedReader.readLine()) != null && counter < amount) {
-                String[] splitLine = line.split(":");
-                switch (splitLine[0]) {
-                    case "[Author" -> { author = splitLine[1].trim();
-                    }
-                    case "Title" -> { title = splitLine[1].trim();
-                    }
-                    case "Pages" -> {
-                        String intLine = splitLine[1].substring(0, splitLine[1].length() - 1).trim();
-                            pages = Integer.valueOf(intLine, 10);
-                            entityFlag = true;
+                if (line.trim().startsWith("[")){
+                    startFlag = true;
+                    author = null;
+                    title = null;
+                    pages = 0;
+                }
+
+                if (line.trim().endsWith("]")) {
+                    startFlag = false;
+                    if (author != null && title != null & pages != 0) {
+                        if (authorValidator.isValid(author) && titleValidator.isValid(title)
+                            && pagesValidator.isValid(pages)){
+                            Book book = new Book.BookBuilder()
+                                    .setAuthor(author)
+                                    .setTitle(title)
+                                    .setPages(pages)
+                                    .build();
+                            rawData.add(book);
                             counter++;
+                        }
+                        else {
+                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
+                        }
                     }
                 }
-                if (entityFlag) {
-                    entityFlag = false;
-                    if (authorValidator.isValid(author) && titleValidator.isValid(title)
-                        && pagesValidator.isValid(pages)){
-                        Book book = new Book.BookBuilder()
-                                .setAuthor(author)
-                                .setTitle(title)
-                                .setPages(pages)
-                                .build();
-                        rawData.add(book);
+
+                String[] splitLine = line.split(":");
+
+                if (startFlag && splitLine.length > 1) {
+                    switch (splitLine[0].trim()) {
+                        case "Author" -> {
+                            author = splitLine[1].trim();
+                        }
+                        case "Title" -> {
+                            title = splitLine[1].trim();
+                        }
+                        case "Pages" -> {
+                            String intLine = splitLine[1].substring(0, splitLine[1].length() - 1).trim();
+                            pages = Integer.valueOf(intLine, 10);
+                        }
                     }
                 }
             }
@@ -98,7 +121,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             bufferedReader.close();
             List<Book> booksList = processedData;
             for (Book book:booksList) {
-                bufferedWriter.write("[Author: ");
+                bufferedWriter.write("[");
+                bufferedWriter.newLine();
+                bufferedWriter.write("Author: ");
                 bufferedWriter.write(book.getAuthor());
                 bufferedWriter.newLine();
                 bufferedWriter.write("Title: ");
@@ -106,6 +131,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 bufferedWriter.newLine();
                 bufferedWriter.write("Pages: ");
                 bufferedWriter.write(book.getPages());
+                bufferedWriter.newLine();
                 bufferedWriter.write("]");
                 bufferedWriter.newLine();
             }
@@ -136,12 +162,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     public void showResultsData() {
 
     }
-/*    public static void main(String[] args) {
+    public static void main(String[] args) {
         String fileName = "C:\\Users\\reeze\\IdeaProjects\\newAstonProject\\input.txt";
         BookStrategy bookStrategy = new BookStrategy();
-        bookStrategy.collectDataFromFile(fileName, 3);
+        bookStrategy.collectDataFromFile(fileName, 4);
         System.out.println(bookStrategy.rawData);
         bookStrategy.saveResultsToFile("example.txt");
 
-    }*/
+    }
 }
