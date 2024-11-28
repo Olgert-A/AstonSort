@@ -1,7 +1,6 @@
 package data.util;
 
 import data.entities.Car;
-import data.validate.Validate;
 
 import java.time.Year;
 import java.util.Comparator;
