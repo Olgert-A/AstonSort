@@ -1,13 +1,20 @@
 package strategy;
 
 import data.entities.Book;
+import data.util.ParityChecker;
+import data.util.Validate;
 import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
@@ -71,11 +78,123 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean collectDataFromFile(String name, int amount) {
+        try (FileReader fileReader = new FileReader(name);
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+            String line;
+            line = bufferedReader.readLine();
+            if (line.isEmpty()) {
+                while (line.isEmpty()) {
+                    line = bufferedReader.readLine();
+                }
+            }
+            if (!(line.equals("Books")) || line == null) {
+                System.out.println("Invalid file");
+                return false;
+            }
+
+            int counter = 0;
+            Validate<String> authorValidator = v -> v.length() > 5;
+            Validate<String> titleValidator = v -> v.length() > 3;
+            Validate <Integer> pagesValidator = v -> v > 1;
+            String author = null, title = null;
+            int pages = 0;
+            boolean startFlag = false;
+
+            while((line = bufferedReader.readLine()) != null && counter < amount) {
+                if (line.trim().startsWith("[")){
+                    startFlag = true;
+                    author = null;
+                    title = null;
+                    pages = 0;
+                }
+
+                if (line.trim().endsWith("]")) {
+                    startFlag = false;
+                    if (author != null && title != null & pages != 0) {
+                        if (authorValidator.isValid(author) && titleValidator.isValid(title)
+                            && pagesValidator.isValid(pages)){
+                            Book book = new Book.BookBuilder()
+                                    .setAuthor(author)
+                                    .setTitle(title)
+                                    .setPages(pages)
+                                    .build();
+                            rawData.add(book);
+                            counter++;
+                        }
+                        else {
+                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
+                        }
+                    }
+                }
+
+                String[] splitLine = line.split(":");
+
+                if (startFlag && splitLine.length > 1) {
+                    switch (splitLine[0].trim()) {
+                        case "Author" -> {
+                            author = splitLine[1].trim();
+                        }
+                        case "Title" -> {
+                            title = splitLine[1].trim();
+                        }
+                        case "Pages" -> {
+                            pages = Integer.valueOf(splitLine[1].trim(), 10);
+                        }
+                    }
+                }
+            }
+            bufferedReader.close();
+            if (counter < amount) {
+                System.out.println("Файл закончился раньше, чем массив заполнился");
+            }
+            return true;
+        }
+        catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         return false;
     }
 
+
     @Override
     public boolean saveResultsToFile(String name) {
+        try (FileWriter fileWriter = new FileWriter(name);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
+            FileReader fileReader = new FileReader(name);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            if (processedData.isEmpty()) {
+                System.out.println("Нечего записывать в файл.");
+                return false;
+            }
+            String line = bufferedReader.readLine();
+            if (line == null) {
+                bufferedReader.close();
+                bufferedWriter.write("Books");
+                bufferedWriter.newLine();
+            }
+            bufferedReader.close();
+            List<Book> booksList = processedData;
+            for (Book book:booksList) {
+                bufferedWriter.write("[");
+                bufferedWriter.newLine();
+                bufferedWriter.write("Author: ");
+                bufferedWriter.write(book.getAuthor());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Title: ");
+                bufferedWriter.write(book.getTitle());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Pages: ");
+                bufferedWriter.write(book.getPages());
+                bufferedWriter.newLine();
+                bufferedWriter.write("]");
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+            return true;
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         return false;
     }
 
