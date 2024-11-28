@@ -134,21 +134,21 @@ public class ConsoleUtil {
     }
 
     public static SortTypeEnum getSortType() throws IOException {
-        SortTypeEnum sortType;
-        StringBuilder requestTextBuilder = new StringBuilder("\nВыберите тип сортировки:");
-        int fieldAmount = CarFieldEnum.values().length;
+        SortTypeEnum[] values = SortTypeEnum.values();
+        final int minOrdinal = values[0].ordinal();
+        final int maxOrdinal = values[values.length-1].ordinal();
 
-        for (var field : CarFieldEnum.values())
-            requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
+        StringBuilder requestText = new StringBuilder("Выберите тип сортировки:");
+        for(var dataType : values)
+            requestText.append("\n").append(dataType.getOrdinalLocaleName());
 
-        Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(), v -> v >= 0 && v < fieldAmount,"Значение должно быть от 0 до " + (fieldAmount - 1));
+        Integer userChoice = getValue(Integer.class, requestText.toString(),
+                v -> v>=minOrdinal && v<= maxOrdinal, CHOICE_INVALID_TEXT);
 
-        if (intUserInput == null) {
-            System.out.println("Не удалось выбрать тип сортировки, операция будет прервана!");
-            throw new IOException("ConsoleUtil.getSortType()");
-        } else
-            sortType = SortTypeEnum.values()[intUserInput];
-        return sortType;
+        if(userChoice == null)
+            throw new IOException("Не удалось выбрать тип сортировки.");
+
+        return values[userChoice];
     }
 
     @SuppressWarnings("unckecked")
