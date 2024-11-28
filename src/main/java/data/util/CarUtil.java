@@ -8,7 +8,7 @@ import java.util.Comparator;
 public class CarUtil {
 
     public static final String MODEL_INVALID_TEXT = "Модель не нулевое значение и не пустая строка, символы должны быть больше или равно 3";
-    public static final String POWER_INVALID_TEXT = "Мощность должна быть больше 0 и меньше или равно 1000";
+    public static final String POWER_INVALID_TEXT = "Мощность должна быть больше 100 и меньше или равно 1000";
     public static final String YEAR_INVALID_TEXT = "Год выпуска должна находится от 2000 до текущего";
 
     public static class CarModelComparator implements Comparator<Car>{
@@ -87,7 +87,7 @@ public class CarUtil {
     public static class CarPowerValidator implements Validate<Integer> {
         @Override
         public boolean isValid(Integer integer) {
-            return integer > 0 && integer <= 1000;
+            return integer > 100 && integer <= 1000;
         }
     }
 
