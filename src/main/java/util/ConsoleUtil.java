@@ -116,10 +116,6 @@ public class ConsoleUtil {
         return userChoice == 0;
     }
 
-    public static SortTypeEnum getSortType() throws IOException {
-        return SortTypeEnum.SORT;
-    }
-
     public static boolean shouldRestartSession() {
         String requestText = """
                 Запустить сессию заново?
