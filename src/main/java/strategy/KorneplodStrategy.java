@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
 
 public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
@@ -223,11 +222,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
-    public void showCollectedData() {
-
-    }
-
-    @Override
     public boolean sort(SortTypeEnum sortType) {
         try {
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
@@ -257,20 +251,12 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     private ParityChecker<Korneplod> getFieldParityChecker(KorneplodFieldEnum sortField) {
-        if (sortField.equals(KorneplodFieldEnum.WEIGHT)) {
-            return new KorneplodUtil();
-        }
         return null;
     }
 
     @Override
     public boolean search() {
         return false;
-    }
-
-    @Override
-    public void showResults() {
-
     }
 
     private static class ConsoleUtil {

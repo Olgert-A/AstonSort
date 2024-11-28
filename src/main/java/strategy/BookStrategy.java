@@ -10,11 +10,9 @@ import util.enums.SortTypeEnum;
 import java.util.Comparator;
 import java.util.Objects;
 
-import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
@@ -200,13 +198,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
     @Override
-    public void showCollectedData() {
-        System.out.println("Исходные данные:");
-        for (var book : this.rawData)
-            System.out.println(book);
-    }
-
-    @Override
     public boolean sort(SortTypeEnum sortType) {
         try {
             BookFieldEnum sortField = ConsoleUtil.getSortField();
@@ -302,13 +293,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             System.out.println("Не найдено");
             return false;
         }
-    }
-
-    @Override
-    public void showResults() {
-        System.out.println("Результат:");
-        for (var book : this.processedData)
-            System.out.println(book);
+        return true;
     }
 
     private static class ConsoleUtil {

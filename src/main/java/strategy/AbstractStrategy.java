@@ -24,6 +24,20 @@ public abstract class AbstractStrategy<T> implements Strategy {
         this.searchAlgorithm = AppUtil.getSearchAlgorithm();
     }
 
+    @Override
+    public void showCollectedData() {
+        System.out.println("Исходные данные:");
+        for (var book : this.rawData)
+            System.out.println(book);
+    }
+
+    @Override
+    public void showResults() {
+        System.out.println("Результат:");
+        for (var book : this.processedData)
+            System.out.println(book);
+    }
+
     void sortByField(SortTypeEnum sortType, Comparator<T> comparator, ParityChecker<T> parityChecker) throws Exception {
         switch (sortType) {
             case SORT -> this.processedData = this.sortAlgorithm.sort(this.rawData, comparator);

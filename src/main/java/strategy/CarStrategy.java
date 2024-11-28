@@ -4,16 +4,14 @@ import data.entities.Car;
 import data.util.CarUtil;
 import data.util.ParityChecker;
 
-import data.util.CarUtil;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
 
 import java.time.Year;
 import java.util.List;
 
+import java.io.*;
 import data.util.Validate;
-import util.enums.CarFieldEnum;
-import util.enums.SortTypeEnum;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -41,7 +39,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             strUserInput = getValue(String.class, CarFieldEnum.MODEL.getLocaleName(),
                     Objects::nonNull, "Модель неверная");
 
-            if (strUserInput == null) {
+            if(strUserInput == null) {
                 System.out.println("Не удалось считать модель, ввод объекта будет пропущен");
                 continue;
             } else
@@ -189,12 +187,45 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
     @Override
     public boolean saveResultsToFile(String name) {
+
+        try (FileWriter fileWriter = new FileWriter(name);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
+            FileReader fileReader = new FileReader(name);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            if (processedData.isEmpty()) {
+                System.out.println("Нечего записывать в файл.");
+                return false;
+            }
+            String line = bufferedReader.readLine();
+            if (line == null) {
+                bufferedReader.close();
+                bufferedWriter.write("Cars");
+                bufferedWriter.newLine();
+            }
+            bufferedReader.close();
+            List<Car> carList = processedData;
+            for (Car car:carList) {
+                bufferedWriter.write("[");
+                bufferedWriter.newLine();
+                bufferedWriter.write("Model: ");
+                bufferedWriter.write(car.getModel());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Power: ");
+                bufferedWriter.write(car.getPower());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Production year: ");
+                bufferedWriter.write(car.getProductionYear());
+                bufferedWriter.newLine();
+                bufferedWriter.write("]");
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+            return true;
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         return false;
-    }
-
-    @Override
-    public void showCollectedData() {
-
     }
 
     @Override
@@ -241,11 +272,6 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
     public boolean search() {
         return false;
-    }
-
-    @Override
-    public void showResults() {
-
     }
 
     private static class ConsoleUtil {
