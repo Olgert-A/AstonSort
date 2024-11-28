@@ -10,11 +10,9 @@ import util.enums.SortTypeEnum;
 import java.util.Comparator;
 import java.util.Objects;
 
-import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {

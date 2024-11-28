@@ -2,7 +2,6 @@ package util;
 
 import data.util.Validate;
 
-import util.enums.CarFieldEnum;
 import util.enums.DataProcessEnum;
 import util.enums.EntityEnum;
 import util.enums.InputTypeEnum;
