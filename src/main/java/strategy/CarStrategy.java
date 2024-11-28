@@ -3,6 +3,14 @@ package strategy;
 import data.entities.Car;
 import data.util.CarUtil;
 import data.util.ParityChecker;
+
+import data.util.CarUtil;
+import util.enums.CarFieldEnum;
+import util.enums.SortTypeEnum;
+
+import java.time.Year;
+import java.util.List;
+
 import data.util.Validate;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
@@ -10,8 +18,10 @@ import util.enums.SortTypeEnum;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
 
@@ -70,7 +80,31 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
     @Override
     public boolean collectRandomData(int amount) {
-        return false;
+        if (amount <= 0) return false;
+        List<String> modelList = List.of("Lada", "Bmw", "Kia", "Porsche", "Hyundai", "Jeep", "Mercedes", "Geely");
+        int minYear = 2000;
+        int maxYear = Year.now().getValue();
+        int minPower = 100;
+        int maxPower = 1000;
+
+        Random random = new Random();
+
+        String model;
+        int power;
+        int year;
+
+        while (rawData.size() < amount) {
+            model = modelList.get(random.nextInt(modelList.size()));
+            power = minPower + random.nextInt(maxPower - minPower + 1);
+            year = minYear + random.nextInt(maxYear - minYear + 1);
+
+            if (new CarUtil.CarModelValidator().isValid(model) && new CarUtil.CarPowerValidator().isValid(power)
+                    && new CarUtil.CarProductionYearValidator().isValid(year)) {
+                Car car = new Car.CarBuilder().setModel(model).setPower(power).setProductionYear(year).build();
+                this.rawData.add(car);
+            }
+        }
+        return true;
     }
 
     @Override

@@ -1,9 +1,12 @@
 package strategy;
 
 import data.entities.Korneplod;
+
 import data.util.KorneplodUtil;
+
 import data.util.ParityChecker;
 import data.util.Validate;
+
 import util.enums.KorneplodFieldEnum;
 import util.enums.SortTypeEnum;
 
@@ -11,6 +14,7 @@ import java.io.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
@@ -70,7 +74,30 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
     @Override
     public boolean collectRandomData(int amount) {
-        return false;
+        if (amount <= 0) return false;
+        List<String> typeList = List.of("Potato", "Carrot", "Beet", "Onion", "Celery", "Turnip", "Garlic", "Radish");
+        List<String> colorList = List.of("Blue", "White", "Black", "Yellow", "Green", "Brown", "Purple", "Orange");
+        double minWeight = 1;
+        double maxWeight = 10;
+
+        Random random = new Random();
+
+        String type;
+        String color;
+        double weight;
+
+        while (rawData.size() < amount) {
+            type = typeList.get(random.nextInt(typeList.size()));
+            color = colorList.get(random.nextInt(colorList.size()));
+            weight = minWeight + random.nextDouble(maxWeight - minWeight + 1);
+
+            if (new KorneplodUtil.KorneplodTypeValidator().isValid(type) && new KorneplodUtil.KorneplodColorValidator().isValid(color)
+                    && new KorneplodUtil.KorneplodWeightValidator().isValid(weight)) {
+                Korneplod korneplod = new Korneplod.KorneplodBuilder().setType(type).setColor(color).setWeight(weight).build();
+                this.rawData.add(korneplod);
+            }
+        }
+        return true;
     }
 
     @Override
