@@ -3,10 +3,12 @@ package strategy;
 import data.entities.Korneplod;
 import data.util.ParityChecker;
 import util.enums.KorneplodFieldEnum;
+import util.enums.SortTypeEnum;
 
 import java.util.Comparator;
 import java.util.Objects;
 
+import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
 
 public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
@@ -84,65 +86,40 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
     @Override
     public boolean sort() {
-        Integer intUserInput;
-        int sortType;
-        KorneplodFieldEnum sortField;
-        Comparator<Korneplod> comparator = null;
-        ParityChecker<Korneplod> parityChecker = null;
+        try {
+            KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
+            SortTypeEnum sortType = getSortType();
+            sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
+        } catch (Exception e) {
+           throw new RuntimeException(e.getMessage());
+        }
+        return true;
+    }
 
-        StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
-        int fieldAmount = KorneplodFieldEnum.values().length;
-        for (var field : KorneplodFieldEnum.values())
-            requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
-
-        intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
-                v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
-
-        if (intUserInput == null) {
-            System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
-            return false;
-        } else
-            sortField = KorneplodFieldEnum.values()[intUserInput];
-
+    private Comparator<Korneplod> getFieldComparator(KorneplodFieldEnum sortField) {
         switch (sortField) {
-            case TYPE -> comparator = Comparator.comparing(Korneplod::getType);
-            case COLOR -> comparator = Comparator.comparing(Korneplod::getColor);
+            case TYPE -> {
+                return Comparator.comparing(Korneplod::getType);
+            }
+            case COLOR -> {
+                return Comparator.comparing(Korneplod::getColor);
+            }
             case WEIGHT -> {
-                comparator = Comparator.comparing(Korneplod::getWeight);
-                parityChecker = v -> v.getWeight() % 2 == 0;
+                return Comparator.comparing(Korneplod::getWeight);
             }
             case ALL -> {
-                comparator = Comparator.comparing(Korneplod::getType)
+                return Comparator.comparing(Korneplod::getType)
                         .thenComparing(Korneplod::getColor).thenComparing(Korneplod::getWeight);
-                parityChecker = v -> v.getWeight() % 2 == 0;
             }
         }
+        return null;
+    }
 
-        String requestText = """
-                Выберите тип сортировки:
-                0 - Обычная
-                1 - Сортировка четных полей""";
-
-        intUserInput = getValue(Integer.class, requestText, v -> v >= 0 && v < 2, "Значение должно быть 0 или 1");
-
-        if (intUserInput == null) {
-            System.out.println("Не удалось выбрать тип сортировки, операция будет прервана!");
-            return false;
-        } else
-            sortType = intUserInput;
-
-        switch (sortType) {
-            case 0 -> this.processedData = this.sortAlgorithm.sort(this.rawData, comparator);
-            case 1 -> {
-                if (parityChecker == null) {
-                    System.out.println("Нельзя использовать сортировку четных полей для выбранного поля");
-                    return false;
-                } else
-                    this.processedData = this.sortAlgorithm.sortEvenValues(this.rawData, comparator, parityChecker);
-            }
+    private ParityChecker<Korneplod> getFieldParityChecker(KorneplodFieldEnum sortField) {
+        if (sortField.equals(KorneplodFieldEnum.WEIGHT)) {
+            return obj -> obj.getWeight() % 2 == 0;
         }
-
-        return true;
+        return null;
     }
 
     @Override
@@ -154,4 +131,27 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     public void showResults() {
 
     }
+
+    private static class ConsoleUtil {
+        public static KorneplodFieldEnum getSortField() throws Exception {
+            KorneplodFieldEnum sortField;
+            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
+            int fieldAmount = KorneplodFieldEnum.values().length;
+
+            for (var field : KorneplodFieldEnum.values())
+                requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
+
+            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
+
+            if (intUserInput == null) {
+                System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
+                throw new Exception("return false");
+            } else
+                sortField = KorneplodFieldEnum.values()[intUserInput];
+            return sortField;
+        }
+    }
+
+
 }
