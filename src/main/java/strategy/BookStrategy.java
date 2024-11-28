@@ -1,8 +1,10 @@
 package strategy;
 
 import data.entities.Book;
+import data.util.Validate;
 import util.enums.BookFieldEnum;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import static util.ConsoleUtil.getValue;
@@ -90,12 +92,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             }
 
             int counter = 0;
-            Validator<String> authorValidator = v -> v.length() > 5;
-            Validator<String> titleValidator = v -> v.length() > 3;
-            Validator <Integer> pagesValidator = v -> v > 1;
+            Validate<String> authorValidator = v -> v.length() > 5;
+            Validate<String> titleValidator = v -> v.length() > 3;
+            Validate <Integer> pagesValidator = v -> v > 1;
             String author = null, title = null;
             int pages = 0;
-            boolean startFlag = false, endFlag = false;
+            boolean startFlag = false;
 
             while((line = bufferedReader.readLine()) != null && counter < amount) {
                 if (line.trim().startsWith("[")){
@@ -135,8 +137,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                             title = splitLine[1].trim();
                         }
                         case "Pages" -> {
-                            String intLine = splitLine[1].substring(0, splitLine[1].length() - 1).trim();
-                            pages = Integer.valueOf(intLine, 10);
+                            pages = Integer.valueOf(splitLine[1].trim(), 10);
                         }
                     }
                 }
