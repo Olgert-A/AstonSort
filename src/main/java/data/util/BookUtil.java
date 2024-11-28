@@ -7,6 +7,10 @@ import java.util.Comparator;
 
 public class BookUtil {
 
+    public static final String AUTHOR_INVALID_TEXT = "Автор не нулевое значение и не пустая строка, символы должны быть больше или равно 3";
+    public static final String TITLE_INVALID_TEXT = "Название не нулевое значение и не пустая строка";
+    public static final String PAGES_INVALID_TEXT = "Страницы должны быть больше 0 и меньше или равно 3000";
+
     public static class BookAuthorComparator implements Comparator<Book> {
         @Override
         public int compare(Book o1, Book o2) {
@@ -72,8 +76,4 @@ public class BookUtil {
             return integer > 0 && integer <=3000;
         }
     }
-
-    public static final String AUTHOR_INVALID_TEXT = "Автор не нулевое значение и не пустая строка, символы должны быть больше или равно 3";
-    public static final String TITLE_INVALID_TEXT = "Название не нулевое значение и не пустая строка";
-    public static final String PAGES_INVALID_TEXT = "Страницы должны быть больше 0 и меньше или равно 3000";
 }
