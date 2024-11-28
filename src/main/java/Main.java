@@ -2,140 +2,119 @@ import strategy.BookStrategy;
 import strategy.CarStrategy;
 import strategy.KorneplodStrategy;
 import strategy.Strategy;
+import util.ConsoleUtil;
+import util.enums.DataProcessEnum;
 import util.enums.EntityEnum;
-import static util.ConsoleUtil.getValue;
+import util.enums.InputTypeEnum;
+import util.enums.SortTypeEnum;
+
+import java.io.IOException;
+
 
 public class Main {
-    public static int DATA_TYPES_AMOUNT = EntityEnum.values().length;
-    public static String DATA_TYPES_INVALID_TEXT = "Ошибка: Значение должно быть от 0 до " + (DATA_TYPES_AMOUNT-1);
-    public static String DATA_SIZE_INVALID_TEXT = "Ошибка: Размер массива должен быть больше 2";
-
-    public static String getDataTypeRequestText() {
-        StringBuilder requestTextBuilder = new StringBuilder("Введите тип данных:");
-        for(var dataType : EntityEnum.values())
-            requestTextBuilder.append("\n").append(dataType.getOrdinalLocaleName());
-        return requestTextBuilder.toString();
-    }
-
-    public static String getInputTypeRequestText() {
-        return """             
-                Введите способ ввода данных:
-                0 - Ручной ввод
-                1 - Случайное заполнение
-                2 - Чтение из файла""";
-    }
-
     public static void main(String[] args) {
-        boolean createNewSession = true;
+        boolean isSessionContinued;
 
         do {
-            Strategy strategy;
-            int dataAmount;
-            Integer userChoise;
+            try {
+                System.out.println("\nНачата новая сессия!\n");
 
-            System.out.println("\nНачата новая сессия!\n");
+                EntityEnum dataType = ConsoleUtil.getDataType();
+                Strategy strategy = getEntityStrategy(dataType);
+                Integer dataSize = ConsoleUtil.getDataSize();
+                InputTypeEnum inputType = ConsoleUtil.getInputType();
+                collectData(inputType, dataSize, strategy);
+                strategy.showCollectedData();
 
-            userChoise = getValue(Integer.class, getDataTypeRequestText(),
-                    v -> v>=0 && v<DATA_TYPES_AMOUNT, DATA_TYPES_INVALID_TEXT);
+                boolean isDataProcessing = true;
+                do {
+                    DataProcessEnum dataProcessType = ConsoleUtil.getDataProcessType();
 
-            switch (userChoise) {
-                case 0 -> strategy = new CarStrategy();
-                case 1 -> strategy = new BookStrategy();
-                case 2 -> strategy = new KorneplodStrategy();
-                case null, default -> {
-                    System.out.println("Не удалось выбрать тип данных, сессия будет перезапущена!");
-                    continue;
+                    switch (dataProcessType) {
+                        case SORT -> sort(strategy);
+                        case SEARCH -> search(strategy);
+                        case NOTHING -> isDataProcessing = false;
+                    }
+                } while (isDataProcessing);
+            }
+            catch (IOException e) {
+                System.out.println(e.getMessage() + " Сессия будет перезапущена!");
+            }
+
+            isSessionContinued = ConsoleUtil.shouldRestartSession();
+
+        } while (isSessionContinued);
+    }
+
+    private static Strategy getEntityStrategy(EntityEnum entity) throws IOException {
+        Strategy strategy = switch (entity) {
+            case CAR -> new CarStrategy();
+            case BOOK -> new BookStrategy();
+            case KORNEPLOD -> new KorneplodStrategy();
+            case null, default -> null;
+        };
+
+        if(strategy == null)
+            throw new IllegalArgumentException("Не удалось выбрать стратегию для выбранного типа данных.");
+
+        return strategy;
+    }
+
+    private static void collectData(InputTypeEnum inputType, Integer dataAmount, Strategy strategy) throws IOException {
+        boolean result = switch (inputType) {
+            case MANUAL -> strategy.collectInputData(dataAmount);
+            case RANDOM -> strategy.collectRandomData(dataAmount);
+            case FILE -> {
+                String fileName = ConsoleUtil.getFileName();
+                yield strategy.collectDataFromFile(fileName, dataAmount);
                 }
-            }
+            case null, default -> throw new IllegalArgumentException("Не удалось обработать выбранный тип данных. ");
+        };
 
-            userChoise = getValue(Integer.class, "Введите размер массива данных:",
-                    v -> v > 2, DATA_SIZE_INVALID_TEXT);
+        if(!result)
+            throw new IOException("Не удалось получить данные.");
 
-            if(userChoise == null) {
-                System.out.println("Не удалось выбрать тип данных, сессия будет перезапущена!");
-                continue;
-            }
+    }
+
+    private static void saveResults(Strategy strategy) {
+        try {
+            String fileName = ConsoleUtil.getFileName();
+            if(strategy.saveResultsToFile(fileName))
+                System.out.println("Сохранение успешно завершено!");
             else
-                dataAmount = userChoise;
+                System.out.println("Не удалось сохранить в файл");
+        } catch (IOException e) {
+            System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
+        }
+    }
 
-            userChoise = getValue(Integer.class, getInputTypeRequestText(),
-                    v -> v>=0 && v<3, "Значение должно быть от 0 до 2");
+    private static void sort(Strategy strategy) {
+        try {
+            SortTypeEnum sortType = ConsoleUtil.getSortType();
 
-            boolean isDataCollected;
-            switch (userChoise) {
-                case 0 -> isDataCollected = strategy.collectInputData(dataAmount);
-                case 1 -> isDataCollected = strategy.collectRandomData(dataAmount);
-                case 2 -> {
-                    String fileName = getValue(String.class, "Введите имя файла:");
-                    if(fileName != null)
-                        isDataCollected = strategy.collectDataFromFile(fileName, dataAmount);
-                    else {
-                        System.out.println("Не удалось прочитать имя файла, сессия будет перезапущена!");
-                        continue;
-                    }
-                }
-                case null, default -> {
-                    isDataCollected = false;
-                    System.out.println("Не удалось выбрать тип данных, сессия будет перезапущена!");
-                    continue;
-                }
+            if(strategy.sort(sortType)) {
+                strategy.showResults();
+
+                boolean shouldSaveResults = ConsoleUtil.shouldSaveToFile();
+
+                if(shouldSaveResults)
+                    saveResults(strategy);
             }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-            if(!isDataCollected) {
-                System.out.println("Данные не были собраны, сессия будет перезапущена!");
-                continue;
-            }
+    private static void search(Strategy strategy) {
+        if(strategy.search()) {
+            strategy.showResults();
 
-            strategy.showCollectedData();
+            boolean shouldSaveResults = ConsoleUtil.shouldSaveToFile();
 
-            boolean continueWorkWithData = true;
-            do {
-                if(strategy.sort()) {
-                    strategy.showResults();
-
-                    String userChoice = getValue(String.class, "Сохранить в файл? (y,n)");
-
-                    if(userChoice != null && userChoice.equals("Y")) {
-                        String fileName = getValue(String.class, "Введите имя файла для сохранения",
-                                s -> !s.isEmpty(), "Ошибка: Имя файла должно содержать хотя бы 1 символ");
-
-                        if (fileName != null)
-                            if (strategy.saveResultsToFile(fileName))
-                                System.out.println("Сохранение успешно завершено!");
-                            else
-                                System.out.println("Не удалось сохранить в файл");
-                        else
-                            System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
-                    }
-                }
-
-                if(strategy.search()) {
-                    strategy.showResults();
-
-                    String userChoice = getValue(String.class, "Сохранить в файл? (y,n)");
-
-                    if (userChoice != null && userChoice.equals("Y")) {
-                        String fileName = getValue(String.class, "Введите имя файла для сохранения",
-                                s -> !s.isEmpty(), "Ошибка: Имя файла должно содержать хотя бы 1 символ");
-
-                        if (fileName != null)
-                            if (strategy.saveResultsToFile(fileName))
-                                System.out.println("Сохранение успешно завершено!");
-                            else
-                                System.out.println("Не удалось сохранить в файл");
-                        else
-                            System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
-                    }
-                }
-
-                String userAnswer = getValue(String.class, "Продолжить работать с данными? (y/n)");
-                continueWorkWithData = userAnswer != null && userAnswer.equals("y");
-
-            } while (continueWorkWithData);
-
-            String userAnswer = getValue(String.class, "Запустить сессию заново? (y/n)");
-            createNewSession = userAnswer != null && userAnswer.equals("y");
-
-        } while (createNewSession);
+            if(shouldSaveResults)
+                saveResults(strategy);
+        }
+        else
+            System.out.println("Элементов не найдено.");
     }
 }

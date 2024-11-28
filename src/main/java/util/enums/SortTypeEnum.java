@@ -6,6 +6,7 @@ public enum SortTypeEnum implements ViewRepresentation {
     SORT("Обычная"),
     SORTEVENVALUES("Сортировка четных полей");
 
+
     private final String localeName;
 
     SortTypeEnum(String localeName) {
@@ -15,6 +16,7 @@ public enum SortTypeEnum implements ViewRepresentation {
     @Override
     public String getLocaleName() {
         return this.localeName;
+
     }
 
     @Override
@@ -23,6 +25,7 @@ public enum SortTypeEnum implements ViewRepresentation {
                 " - " +
                 this.localeName;
     }
+
 
     @Override
     public String toString() {

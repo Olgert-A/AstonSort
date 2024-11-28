@@ -1,14 +1,10 @@
 package strategy;
 
 import data.entities.Book;
-import data.util.ParityChecker;
 import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import static util.ConsoleUtil.getSortType;
 import static util.ConsoleUtil.getValue;
@@ -69,23 +65,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean collectRandomData(int amount) {
-        List<String> authorList = List.of("Samuel", "Winston", "Michael", "Oliver", "Andy", "David", "Jason", "Max");
-        List<String> titleList = List.of("Some book", "Another book", "Best book", "Selling book", "Misery book");
-
-        Random random = new Random();
-
-        String author;
-        String title;
-        int pages;
-
-        for (int i = 0; i < amount; i++) {
-            author = authorList.get(random.nextInt(authorList.size()));
-            title = titleList.get(random.nextInt(titleList.size()));
-            pages = random.nextInt(1000);
-
-            Book book = new Book.BookBuilder().setAuthor(author).setTitle(title).setPages(pages).build();
-            this.rawData.add(book);
-        }
 
         return true;
     }
@@ -108,10 +87,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
     @Override
-    public boolean sort() {
+    public boolean sort(SortTypeEnum sortType) {
         try {
             BookFieldEnum sortField = ConsoleUtil.getSortField();
-            SortTypeEnum sortType = getSortType();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -206,10 +184,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             System.out.println("Не найдено");
             return false;
         }
-
-        this.processedData.clear();
-        this.processedData.add(found);
-        return true;
     }
 
     @Override

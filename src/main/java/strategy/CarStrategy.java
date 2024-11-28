@@ -85,10 +85,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
-    public boolean sort() {
+    public boolean sort(SortTypeEnum sortType) {
         try {
             CarFieldEnum sortField = ConsoleUtil.getSortField();
-            SortTypeEnum sortType = getSortType();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

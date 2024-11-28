@@ -85,7 +85,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
-    public boolean sort() {
+    public boolean sort(SortTypeEnum sortType) {
         try {
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
             SortTypeEnum sortType = getSortType();
