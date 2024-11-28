@@ -257,9 +257,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     private ParityChecker<Korneplod> getFieldParityChecker(KorneplodFieldEnum sortField) {
-        if (sortField.equals(KorneplodFieldEnum.WEIGHT)) {
-            return new KorneplodUtil();
-        }
         return null;
     }
 
