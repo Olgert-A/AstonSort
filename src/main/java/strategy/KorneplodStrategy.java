@@ -222,11 +222,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     @Override
-    public void showCollectedData() {
-
-    }
-
-    @Override
     public boolean sort(SortTypeEnum sortType) {
         try {
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
@@ -262,11 +257,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     @Override
     public boolean search() {
         return false;
-    }
-
-    @Override
-    public void showResults() {
-
     }
 
     private static class ConsoleUtil {

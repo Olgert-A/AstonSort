@@ -193,11 +193,6 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
-    public void showCollectedData() {
-
-    }
-
-    @Override
     public boolean sort(SortTypeEnum sortType) {
         try {
             CarFieldEnum sortField = ConsoleUtil.getSortField();
@@ -241,11 +236,6 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
     public boolean search() {
         return false;
-    }
-
-    @Override
-    public void showResults() {
-
     }
 
     private static class ConsoleUtil {

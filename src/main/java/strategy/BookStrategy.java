@@ -198,13 +198,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
     @Override
-    public void showCollectedData() {
-        System.out.println("Исходные данные:");
-        for (var book : this.rawData)
-            System.out.println(book);
-    }
-
-    @Override
     public boolean sort(SortTypeEnum sortType) {
         try {
             BookFieldEnum sortField = ConsoleUtil.getSortField();
@@ -301,13 +294,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public void showResults() {
-        System.out.println("Результат:");
-        for (var book : this.processedData)
-            System.out.println(book);
     }
 
     private static class ConsoleUtil {
