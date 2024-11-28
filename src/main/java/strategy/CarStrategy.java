@@ -4,7 +4,6 @@ import data.entities.Car;
 import data.util.CarUtil;
 import data.util.ParityChecker;
 
-import data.util.CarUtil;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
 
@@ -12,8 +11,6 @@ import java.time.Year;
 import java.util.List;
 
 import data.util.Validate;
-import util.enums.CarFieldEnum;
-import util.enums.SortTypeEnum;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
