@@ -2,6 +2,7 @@ package strategy;
 
 import data.entities.Car;
 import util.enums.CarFieldEnum;
+import util.enums.SortTypeEnum;
 
 import java.util.Objects;
 
@@ -84,7 +85,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
-    public boolean sort() {
+    public boolean sort(SortTypeEnum sortType) {
         return false;
     }
 
