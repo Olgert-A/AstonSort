@@ -131,15 +131,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
                 if (startFlag && splitLine.length > 1) {
                     switch (splitLine[0].trim()) {
-                        case "Type" -> {
-                            type = splitLine[1].trim();
-                        }
-                        case "Weight" -> {
-                            weight = Double.valueOf(splitLine[1].trim());
-                        }
-                        case "Color" -> {
-                            color = splitLine[1].trim();
-                        }
+                        case "Type" -> type = splitLine[1].trim();
+                        case "Weight" -> weight = Double.parseDouble(splitLine[1].trim());
+                        case "Color" -> color = splitLine[1].trim();
                     }
                 }
             }

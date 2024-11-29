@@ -135,15 +135,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
                 if (startFlag && splitLine.length > 1) {
                     switch (splitLine[0].trim()) {
-                        case "Model" -> {
-                            model = splitLine[1].trim();
-                        }
-                        case "Power" -> {
-                            power = Integer.valueOf(splitLine[1].trim());
-                        }
-                        case "Production year" -> {
-                            productionYear = Integer.valueOf(splitLine[1].trim(), 10);
-                        }
+                        case "Model" -> model = splitLine[1].trim();
+                        case "Power" -> power = Integer.parseInt(splitLine[1].trim());
+                        case "Production year" -> productionYear = Integer.valueOf(splitLine[1].trim(), 10);
                     }
                 }
             }

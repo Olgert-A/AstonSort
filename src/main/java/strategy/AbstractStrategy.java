@@ -15,8 +15,8 @@ import java.util.List;
 public abstract class AbstractStrategy<T> implements Strategy {
     protected List<T> rawData;
     protected List<T> processedData;
-    protected SortAlgorithm<T> sortAlgorithm;
-    protected SearchAlgorithm<T> searchAlgorithm;
+    protected final SortAlgorithm<T> sortAlgorithm;
+    protected final SearchAlgorithm<T> searchAlgorithm;
 
     public AbstractStrategy() {
         this.rawData = new ArrayList<>();
