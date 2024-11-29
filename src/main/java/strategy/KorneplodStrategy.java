@@ -8,6 +8,8 @@ import util.enums.SortTypeEnum;
 
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +27,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             String type, color;
             double weight;
 
-            System.out.println("\nЗаполните кореплод №" + korneplodCount);
+            System.out.println("\nЗаполните кореплод №" + (korneplodCount + 1));
             try {
                 type = ConsoleUtil.getType();
                 weight = ConsoleUtil.getWeight();
@@ -152,7 +154,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);
@@ -167,6 +169,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 bufferedWriter.write("Korneplods");
                 bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
             bufferedReader.close();
             List<Korneplod> korneplodsList = processedData;
             for (Korneplod korneplod : korneplodsList) {

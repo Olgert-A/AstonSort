@@ -7,6 +7,8 @@ import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +27,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             String author, title;
             int pages;
 
-            System.out.println("\nЗаполните книгу №" + booksCount);
+            System.out.println("\nЗаполните книгу №" + (booksCount + 1));
             try {
                 author = ConsoleUtil.getAuthorField();
                 title = ConsoleUtil.getTitleField();
@@ -150,7 +152,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);
@@ -165,6 +167,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 bufferedWriter.write("Books");
                 bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
             bufferedReader.close();
             List<Book> booksList = processedData;
             for (Book book : booksList) {
