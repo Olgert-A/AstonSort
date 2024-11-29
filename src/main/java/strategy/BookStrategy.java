@@ -7,6 +7,8 @@ import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -151,22 +153,19 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
-            FileReader fileReader = new FileReader(name);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
                 System.out.println("Нечего записывать в файл.");
                 return false;
             }
-            String line = bufferedReader.readLine();
-            if (line == null) {
-                bufferedReader.close();
-                bufferedWriter.write("Books");
-                bufferedWriter.newLine();
-            }
-            bufferedReader.close();
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
+            bufferedWriter.write("Books");
+            bufferedWriter.newLine();
+            bufferedWriter.newLine();
             List<Book> booksList = processedData;
             for (Book book : booksList) {
                 bufferedWriter.write("[");

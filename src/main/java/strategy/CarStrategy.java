@@ -7,7 +7,9 @@ import data.util.ParityChecker;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
 
+import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import java.io.*;
@@ -191,19 +193,16 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
         try (FileWriter fileWriter = new FileWriter(name);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
-            FileReader fileReader = new FileReader(name);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
                 System.out.println("Нечего записывать в файл.");
                 return false;
             }
-            String line = bufferedReader.readLine();
-            if (line == null) {
-                bufferedReader.close();
-                bufferedWriter.write("Cars");
-                bufferedWriter.newLine();
-            }
-            bufferedReader.close();
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
+            bufferedWriter.write("Cars");
+            bufferedWriter.newLine();
+            bufferedWriter.newLine();
             List<Car> carList = processedData;
             for (Car car : carList) {
                 bufferedWriter.write("[");
