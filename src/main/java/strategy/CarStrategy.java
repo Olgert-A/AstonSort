@@ -34,7 +34,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 power = ConsoleUtil.getPowerField();
                 productionYear = ConsoleUtil.getProductionYearField();
             } catch (IOException e) {
+                System.out.println();
                 System.out.println(e.getMessage() + " Заполнение машины начнётся с начала");
+                System.out.println();
                 continue;
             }
 
@@ -45,7 +47,8 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                     .build();
 
             this.rawData.add(car);
-        } while (++carCount < amount);
+            carCount++;
+        } while (carCount < amount);
 
         return true;
     }
@@ -144,7 +147,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             }
             bufferedReader.close();
             if (counter < amount) {
+                System.out.println();
                 System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " машин.");
+                System.out.println();
             }
             return true;
         } catch (IOException ex) {
@@ -207,7 +212,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             CarFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            System.out.println();
             return false;
         }
 
@@ -244,7 +251,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             searchValue = getSearchValue(searchField);
             comparator = getFieldComparator(searchField);
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            System.out.println();
             return false;
         } catch (IllegalArgumentException e) {
             return false;
