@@ -18,6 +18,7 @@ import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
 
+
 public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
     @Override
     public boolean collectInputData(int amount) {
@@ -118,13 +119,13 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
             int counter = 0;
             Validate<String> typeAndColorValidator = v -> v.length() > 5;
-            Validate <Double> weightValidator = v -> v > 0;
+            Validate<Double> weightValidator = v -> v > 0;
             String type = null, color = null;
             double weight = 0;
             boolean startFlag = false;
 
-            while((line = bufferedReader.readLine()) != null && counter < amount) {
-                if (line.trim().startsWith("[")){
+            while ((line = bufferedReader.readLine()) != null && counter < amount) {
+                if (line.trim().startsWith("[")) {
                     startFlag = true;
                     type = null;
                     weight = 0;
@@ -135,7 +136,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                     startFlag = false;
                     if (type != null && color != null & weight != 0) {
                         if (typeAndColorValidator.isValid(type) && weightValidator.isValid(weight)
-                                && typeAndColorValidator.isValid(color)){
+                                && typeAndColorValidator.isValid(color)) {
                             Korneplod korneplod = new Korneplod.KorneplodBuilder()
                                     .setType(type)
                                     .setWeight(weight)
@@ -143,8 +144,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                                     .build();
                             rawData.add(korneplod);
                             counter++;
-                        }
-                        else {
+                        } else {
                             System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
@@ -171,8 +171,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 System.out.println("Файл закончился раньше, чем массив заполнился");
             }
             return true;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
         return false;
@@ -198,7 +197,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             }
             bufferedReader.close();
             List<Korneplod> korneplodsList = processedData;
-            for (Korneplod korneplod:korneplodsList) {
+            for (Korneplod korneplod : korneplodsList) {
                 bufferedWriter.write("[");
                 bufferedWriter.newLine();
                 bufferedWriter.write("Type: ");
@@ -227,9 +226,40 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (Exception e) {
-           throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
         return true;
+    }
+
+    @Override
+    public boolean search() {
+        KorneplodFieldEnum searchField = ConsoleUtil.getSearchField();
+
+        if (searchField == null) {
+            System.out.println("No search field found");
+            return false;
+        }
+        Korneplod searchValue = getSearchValue(searchField);
+        if (searchValue != null) {
+            System.out.println("что-то пошло не так");
+            return false;
+        }
+        Comparator<Korneplod> comparator = getFieldComparator(searchField);
+        if (comparator == null) {
+
+            System.out.println("Компаратор не найден!");
+            return false;
+        }
+        List<Korneplod> sortedData = this.sortAlgorithm.sort(this.rawData, comparator);
+        Korneplod result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
+
+        if (result == null) {
+            return false;
+        }
+        this.processedData.clear();
+        this.processedData.add(result);
+        return true;
+
     }
 
     private Comparator<Korneplod> getFieldComparator(KorneplodFieldEnum sortField) {
@@ -254,10 +284,40 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
         return null;
     }
 
-    @Override
-    public boolean search() {
-        return false;
+    private Korneplod getSearchValue(KorneplodFieldEnum searchField) {
+        Korneplod.KorneplodBuilder builder = new Korneplod.KorneplodBuilder();
+        switch (searchField) {
+            case TYPE -> {
+                String type = ConsoleUtil.getType();
+                if (type == null) {
+                    return null;
+                }
+                return builder.setType(type).build();
+            }
+            case COLOR -> {
+                String color = ConsoleUtil.getColor();
+                if (color == null) {
+                    return null;
+                }
+                return builder.setColor(color).build();
+            }
+            case WEIGHT -> {
+                Double weight = ConsoleUtil.getWeight();
+                if (weight == null) {
+                    return null;
+                }
+                return builder.setWeight(weight).build();
+            }
+            case ALL -> {
+                System.out.println("нельзя искать всё!");
+                return null;
+            }
+            default -> {
+                return null;
+            }
+        }
     }
+
 
     private static class ConsoleUtil {
         public static KorneplodFieldEnum getSortField() throws Exception {
@@ -278,7 +338,21 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 sortField = KorneplodFieldEnum.values()[intUserInput];
             return sortField;
         }
+
+        public static KorneplodFieldEnum getSearchField() {
+            return null;
+        }
+
+        public static String getType() {
+            return null;
+        }
+
+        public static Double getWeight() {
+            return null;
+        }
+
+        public static String getColor() {
+            return null;
+        }
     }
-
-
 }
