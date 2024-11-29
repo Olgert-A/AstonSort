@@ -96,7 +96,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 }
             }
             if (!(line.equals("Cars")) || line == null) {
-                System.out.println("Invalid file");
+                System.out.println("Файл не содержит данных выбранного типа.");
                 return false;
             }
 
@@ -126,8 +126,6 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                                     .build();
                             rawData.add(car);
                             counter++;
-                        } else {
-                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
                 }
@@ -144,7 +142,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             }
             bufferedReader.close();
             if (counter < amount) {
-                System.out.println("Файл закончился раньше, чем массив заполнился");
+                System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " машин.");
             }
             return true;
         } catch (IOException ex) {
@@ -156,13 +154,15 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
     public boolean saveResultsToFile(String name) {
 
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
+                System.out.println();
                 System.out.println("Нечего записывать в файл.");
+                System.out.println();
                 return false;
             }
             String line = bufferedReader.readLine();
