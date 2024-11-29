@@ -6,6 +6,7 @@ import data.util.ParityChecker;
 import util.enums.BookFieldEnum;
 import util.enums.KorneplodFieldEnum;
 import util.enums.SortTypeEnum;
+import util.enums.ViewOrdinalUtil;
 
 import java.io.*;
 import java.util.Comparator;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
+import static util.enums.ViewOrdinalUtil.*;
 
 
 public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
@@ -318,11 +320,11 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
         private static KorneplodFieldEnum getKorneplodField(String fieldUsage) throws IOException {
             KorneplodFieldEnum[] values = KorneplodFieldEnum.values();
-            final int minOrdinal = values[0].ordinal();
-            final int maxOrdinal = values[values.length - 1].ordinal();
+            final int minOrdinal = getViewOrdinal(values[0].ordinal());
+            final int maxOrdinal = getViewOrdinal(values[values.length - 1].ordinal());
 
             StringBuilder requestTextBuilder = new StringBuilder("Выберите поля " + fieldUsage + ":");
-            for (var field : BookFieldEnum.values())
+            for (var field : values)
                 requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
 
             Integer userInput = getValue(Integer.class, requestTextBuilder.toString(),
@@ -331,7 +333,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             if (userInput == null)
                 throw new IOException("Не удалось выбрать поля " + fieldUsage + ".");
 
-            return KorneplodFieldEnum.values()[userInput];
+            return values[getOrdinalBy(userInput)];
         }
     }
 }
