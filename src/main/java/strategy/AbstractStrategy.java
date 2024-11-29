@@ -27,16 +27,20 @@ public abstract class AbstractStrategy<T> implements Strategy {
 
     @Override
     public void showCollectedData() {
+        System.out.println();
         System.out.println("Исходные данные:");
         for (var book : this.rawData)
             System.out.println(book);
+        System.out.println();
     }
 
     @Override
     public void showResults() {
+        System.out.println();
         System.out.println("Результат:");
         for (var book : this.processedData)
             System.out.println(book);
+        System.out.println();
     }
 
     void sortByField(SortTypeEnum sortType,
