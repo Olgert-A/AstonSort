@@ -3,10 +3,9 @@ package strategy;
 import data.entities.Korneplod;
 import data.util.KorneplodUtil;
 import data.util.ParityChecker;
-import util.enums.BookFieldEnum;
 import util.enums.KorneplodFieldEnum;
 import util.enums.SortTypeEnum;
-import util.enums.ViewOrdinalUtil;
+
 
 import java.io.*;
 import java.util.Comparator;

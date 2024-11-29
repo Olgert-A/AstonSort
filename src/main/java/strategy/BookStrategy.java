@@ -5,7 +5,6 @@ import data.util.BookUtil;
 import data.util.ParityChecker;
 import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
-import util.enums.ViewOrdinalUtil;
 
 import java.io.*;
 import java.util.Comparator;

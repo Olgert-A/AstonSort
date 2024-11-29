@@ -3,10 +3,9 @@ package strategy;
 import data.entities.Car;
 import data.util.CarUtil;
 import data.util.ParityChecker;
-import util.enums.BookFieldEnum;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
-import util.enums.ViewOrdinalUtil;
+
 
 import java.io.*;
 import java.time.Year;
