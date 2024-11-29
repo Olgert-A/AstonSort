@@ -6,14 +6,11 @@ import java.util.List;
 public class BinarySearch<T> implements SearchAlgorithm<T> {
     @Override
     public T findByField(List<T> data, T fieldValue, Comparator<T> comparator) {
-
-        data.sort(comparator);
-
         int left = 0;
         int right = data.size() - 1;
 
         while (left <= right) {
-             int mid = (left + right) / 2;
+            int mid = (left + right) / 2;
             T midItem = data.get(mid);
 
             int compareResult = comparator.compare(midItem, fieldValue);

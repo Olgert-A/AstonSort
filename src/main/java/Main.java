@@ -38,7 +38,9 @@ public class Main {
                 } while (isDataProcessing);
             }
             catch (IOException e) {
+                System.out.println();
                 System.out.println(e.getMessage() + " Сессия будет перезапущена!");
+                System.out.println();
             }
 
             isSessionContinued = ConsoleUtil.shouldRestartSession();
@@ -84,7 +86,9 @@ public class Main {
             else
                 System.out.println("Не удалось сохранить в файл");
         } catch (IOException e) {
+            System.out.println();
             System.out.println("Не удалось прочитать имя файла, запись в файл будет пропущена");
+            System.out.println();
         }
     }
 
@@ -101,7 +105,9 @@ public class Main {
                     saveResults(strategy);
             }
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage());
+            System.out.println();
         }
     }
 
@@ -114,7 +120,11 @@ public class Main {
             if(shouldSaveResults)
                 saveResults(strategy);
         }
-        else
+        else{
+            System.out.println();
             System.out.println("Элементов не найдено.");
+            System.out.println();
+        }
+
     }
 }

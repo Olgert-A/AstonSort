@@ -129,7 +129,7 @@ public class ConsoleUtil {
                 v -> v>=minOrdinal && v<= maxOrdinal, CHOICE_INVALID_TEXT);
 
         if(userChoice == null){
-            System.out.println("Не удалось выбрать вариант. Сохранение не будет произведено.");
+            System.out.println("Не удалось выбрать вариант. Сессия будет завершена.");
             return false;
         }
 
@@ -195,7 +195,11 @@ public class ConsoleUtil {
 
             if(validate != null && invalidText != null)
                 if(!validate.isValid(result)) {
-                    System.out.println(invalidText);
+                    if(attempt < readAttempts-1) {
+                        System.out.println();
+                        System.out.println(invalidText);
+                        System.out.println();
+                    }
                     result = null;
                 }
                 else

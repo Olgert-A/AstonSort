@@ -8,6 +8,8 @@ import util.enums.SortTypeEnum;
 
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -25,13 +27,15 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             String type, color;
             double weight;
 
-            System.out.println("\nЗаполните кореплод №" + korneplodCount);
+            System.out.println("\nЗаполните кореплод №" + (korneplodCount + 1));
             try {
                 type = ConsoleUtil.getType();
                 weight = ConsoleUtil.getWeight();
                 color = ConsoleUtil.getColor();
             } catch (IOException e) {
-                System.out.println(e.getMessage() + " Заполнение книги начнётся с начала");
+                System.out.println();
+                System.out.println(e.getMessage() + " Заполнение корнеплода начнётся с начала");
+                System.out.println();
                 continue;
             }
 
@@ -42,7 +46,8 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                     .build();
 
             this.rawData.add(korneplod);
-        } while (++korneplodCount < amount);
+            korneplodCount++;
+        } while (korneplodCount < amount);
 
         return true;
     }
@@ -94,7 +99,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 }
             }
             if (!(line.equals("Korneplods")) || line == null) {
-                System.out.println("Invalid file");
+                System.out.println("Файл не содержит данных выбранного типа.");
                 return false;
             }
 
@@ -122,8 +127,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                                     .build();
                             rawData.add(korneplod);
                             counter++;
-                        } else {
-                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
                 }
@@ -140,7 +143,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             }
             bufferedReader.close();
             if (counter < amount) {
-                System.out.println("Файл закончился раньше, чем массив заполнился");
+                System.out.println();
+                System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " корнеплодов.");
+                System.out.println();
             }
             return true;
         } catch (IOException ex) {
@@ -152,7 +157,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);
@@ -167,6 +172,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 bufferedWriter.write("Korneplods");
                 bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
             bufferedReader.close();
             List<Korneplod> korneplodsList = processedData;
             for (Korneplod korneplod : korneplodsList) {
@@ -198,7 +206,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            System.out.println();
             return false;
         }
 
@@ -216,7 +226,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             searchValue = getSearchValue(searchField);
             comparator = getFieldComparator(searchField);
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            System.out.println();
             return false;
         } catch (IllegalArgumentException e) {
             return false;

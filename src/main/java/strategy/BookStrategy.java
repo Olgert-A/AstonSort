@@ -7,6 +7,8 @@ import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -25,13 +27,15 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             String author, title;
             int pages;
 
-            System.out.println("\nЗаполните книгу №" + booksCount);
+            System.out.println("\nЗаполните книгу №" + (booksCount + 1));
             try {
                 author = ConsoleUtil.getAuthorField();
                 title = ConsoleUtil.getTitleField();
                 pages = ConsoleUtil.getPagesField();
             } catch (IOException e) {
+                System.out.println();
                 System.out.println(e.getMessage() + " Заполнение книги начнётся с начала");
+                System.out.println();
                 continue;
             }
 
@@ -42,7 +46,8 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                     .build();
 
             this.rawData.add(book);
-        } while (++booksCount < amount);
+            booksCount++;
+        } while (booksCount < amount);
 
         return true;
     }
@@ -90,7 +95,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 }
             }
             if (!(line.equals("Books")) || line == null) {
-                System.out.println("Invalid file");
+                System.out.println("Файл не содержит данных выбранного типа.");
                 return false;
             }
 
@@ -120,8 +125,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                                     .build();
                             rawData.add(book);
                             counter++;
-                        } else {
-                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
                 }
@@ -138,7 +141,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             }
             bufferedReader.close();
             if (counter < amount) {
-                System.out.println("Файл закончился раньше, чем массив заполнился");
+                System.out.println();
+                System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " книг.");
+                System.out.println();
             }
             return true;
         } catch (IOException ex) {
@@ -150,13 +155,15 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
+                System.out.println();
                 System.out.println("Нечего записывать в файл.");
+                System.out.println();
                 return false;
             }
             String line = bufferedReader.readLine();
@@ -165,6 +172,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 bufferedWriter.write("Books");
                 bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
             bufferedReader.close();
             List<Book> booksList = processedData;
             for (Book book : booksList) {
@@ -196,7 +206,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             BookFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            System.out.println();
             return false;
         }
 
@@ -233,7 +245,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             searchValue = getSearchValue(searchField);
             comparator = getFieldComparator(searchField);
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            System.out.println();
             return false;
         } catch (IllegalArgumentException e) {
             return false;

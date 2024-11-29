@@ -39,10 +39,10 @@ public class Book  {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "author='" + author + '\'' +
-                ", title='" + title + '\'' +
-                ", pages=" + pages +
+        return "Книга{" +
+                "Автор='" + author + '\'' +
+                ", Название книги='" + title + '\'' +
+                ", Количество страниц=" + pages +
                 '}';
     }
 

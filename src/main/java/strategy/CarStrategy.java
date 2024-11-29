@@ -8,7 +8,9 @@ import util.enums.SortTypeEnum;
 
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -26,13 +28,15 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             String model;
             int power, productionYear;
 
-            System.out.println("\nЗаполните машину №" + carCount);
+            System.out.println("\nЗаполните машину №" + (carCount + 1));
             try {
                 model = ConsoleUtil.getModelField();
                 power = ConsoleUtil.getPowerField();
                 productionYear = ConsoleUtil.getProductionYearField();
             } catch (IOException e) {
+                System.out.println();
                 System.out.println(e.getMessage() + " Заполнение машины начнётся с начала");
+                System.out.println();
                 continue;
             }
 
@@ -43,7 +47,8 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                     .build();
 
             this.rawData.add(car);
-        } while (++carCount < amount);
+            carCount++;
+        } while (carCount < amount);
 
         return true;
     }
@@ -96,7 +101,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 }
             }
             if (!(line.equals("Cars")) || line == null) {
-                System.out.println("Invalid file");
+                System.out.println("Файл не содержит данных выбранного типа.");
                 return false;
             }
 
@@ -126,8 +131,6 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                                     .build();
                             rawData.add(car);
                             counter++;
-                        } else {
-                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
                 }
@@ -144,7 +147,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             }
             bufferedReader.close();
             if (counter < amount) {
-                System.out.println("Файл закончился раньше, чем массив заполнился");
+                System.out.println();
+                System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " машин.");
+                System.out.println();
             }
             return true;
         } catch (IOException ex) {
@@ -156,13 +161,15 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
     public boolean saveResultsToFile(String name) {
 
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             if (processedData.isEmpty()) {
+                System.out.println();
                 System.out.println("Нечего записывать в файл.");
+                System.out.println();
                 return false;
             }
             String line = bufferedReader.readLine();
@@ -171,6 +178,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 bufferedWriter.write("Cars");
                 bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
             bufferedReader.close();
             List<Car> carList = processedData;
             for (Car car : carList) {
@@ -202,7 +212,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             CarFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            System.out.println();
             return false;
         }
 
@@ -239,7 +251,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             searchValue = getSearchValue(searchField);
             comparator = getFieldComparator(searchField);
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            System.out.println();
             return false;
         } catch (IllegalArgumentException e) {
             return false;
