@@ -7,17 +7,13 @@ import data.util.Validate;
 import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
-import java.util.Comparator;
-import java.util.Objects;
-
-import static util.ConsoleUtil.getValue;
-
 import java.io.*;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
-import java.util.Comparator;
-import java.util.List;
+import static util.ConsoleUtil.getValue;
 
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
@@ -90,7 +86,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             title = titleList.get(random.nextInt(titleList.size()));
             pages = random.nextInt(1000);
 
-            if(new BookUtil.BookAuthorValidator().isValid(author) &&
+            if (new BookUtil.BookAuthorValidator().isValid(author) &&
                     new BookUtil.BookTitleValidator().isValid(title) &&
                     new BookUtil.BookPagesValidator().isValid(pages)) {
                 Book book = new Book.BookBuilder().setAuthor(author).setTitle(title).setPages(pages).build();
@@ -119,13 +115,13 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             int counter = 0;
             Validate<String> authorValidator = v -> v.length() > 5;
             Validate<String> titleValidator = v -> v.length() > 3;
-            Validate <Integer> pagesValidator = v -> v > 1;
+            Validate<Integer> pagesValidator = v -> v > 1;
             String author = null, title = null;
             int pages = 0;
             boolean startFlag = false;
 
-            while((line = bufferedReader.readLine()) != null && counter < amount) {
-                if (line.trim().startsWith("[")){
+            while ((line = bufferedReader.readLine()) != null && counter < amount) {
+                if (line.trim().startsWith("[")) {
                     startFlag = true;
                     author = null;
                     title = null;
@@ -136,7 +132,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                     startFlag = false;
                     if (author != null && title != null & pages != 0) {
                         if (authorValidator.isValid(author) && titleValidator.isValid(title)
-                            && pagesValidator.isValid(pages)){
+                                && pagesValidator.isValid(pages)) {
                             Book book = new Book.BookBuilder()
                                     .setAuthor(author)
                                     .setTitle(title)
@@ -144,8 +140,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                                     .build();
                             rawData.add(book);
                             counter++;
-                        }
-                        else {
+                        } else {
                             System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
@@ -172,8 +167,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 System.out.println("Файл закончился раньше, чем массив заполнился");
             }
             return true;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
         return false;
@@ -199,7 +193,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             }
             bufferedReader.close();
             List<Book> booksList = processedData;
-            for (Book book:booksList) {
+            for (Book book : booksList) {
                 bufferedWriter.write("[");
                 bufferedWriter.newLine();
                 bufferedWriter.write("Author: ");
@@ -256,36 +250,30 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
         return null;
     }
 
+
     @Override
-    public void searchByField(ViewRepresentationEnum field, Number fieldValue) {
+    public boolean search() {
+        BookFieldEnum searchField = ConsoleUtil.getSearchField();
 
-    }
-
-
-    }
-    @Override
-    public boolean search (){
-        BookFieldEnum searchField = BookConsoleUtil.getSearchField();
-
-        if (searchField == null){
+        if (searchField == null) {
             System.out.println("No search field found");
             return false;
         }
-        Book searchValue =  getSearchValue(searchField);
-        if (searchValue != null){
-            System.out.println( "что-то пошло не так");
+        Book searchValue = getSearchValue(searchField);
+        if (searchValue != null) {
+            System.out.println("что-то пошло не так");
             return false;
         }
-        Comparator <Book> comparator = getFieldComparator(searchField);
-        if (comparator == null){
+        Comparator<Book> comparator = getFieldComparator(searchField);
+        if (comparator == null) {
 
             System.out.println("Компаратор не найден!");
             return false;
         }
-        List <Book>  sortedData = this.sortAlgorithm(this.rawData, comparator);
+        List<Book> sortedData = this.sortAlgorithm.sort(this.rawData, comparator);
         Book result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
 
-        if (result == null){
+        if (result == null) {
             return false;
         }
         this.processedData.clear();
@@ -294,44 +282,26 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     }
 
-    private Comparator <Book> getFieldComparator(BookFieldEnum field) {
 
-        switch (field) {
-            case AUTHOR ->{
-                return Comparator.comparing(Book::getAuthor);
-            }
-            case TITLE ->{
-                return Comparator.comparing(Book::getTitle);
-            }
-            case PAGES ->{
-                return Comparator.comparing(Book::getPages);
-            }
-             default ->
-            {
-                return null;
-            }
-        }
-
-    }
-    private Book getSearchValue (BookFieldEnum searchField) {
+    private Book getSearchValue(BookFieldEnum searchField) {
         Book.BookBuilder builder = new Book.BookBuilder();
         switch (searchField) {
-            case AUTHOR ->{
-                String author = BookConsoleUtil.getAuthorField();
+            case AUTHOR -> {
+                String author = ConsoleUtil.getAuthorField();
                 if (author == null) {
                     return null;
                 }
                 return builder.setAuthor(author).build();
             }
-            case TITLE ->{
-                String title = BookConsoleUtil.getTitleField();
+            case TITLE -> {
+                String title = ConsoleUtil.getTitleField();
                 if (title == null) {
                     return null;
                 }
                 return builder.setTitle(title).build();
             }
-            case PAGES ->{
-                Integer pages = BookConsoleUtil.getPagesField();
+            case PAGES -> {
+                Integer pages = ConsoleUtil.getPagesField();
                 if (pages == null) {
                     return null;
                 }
@@ -349,12 +319,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
 
-    private List<Book> sortAlgorithm(List<Book> rawData, Comparator<Book> comparator) {
-    }
-
-
-    @Override
-    public void showResultsData() {
     private static class ConsoleUtil {
 
         public static BookFieldEnum getSortField() throws Exception {
@@ -374,19 +338,21 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 sortField = BookFieldEnum.values()[intUserInput];
             return sortField;
         }
-    }
-    public static class BookConsoleUtil {
-        public static BookFieldEnum getSearchField(){
+
+        public static BookFieldEnum getSearchField() {
             return null;
         }
-        public static  String getAuthorField(){
+
+        public static String getAuthorField() {
             return null;
         }
-       public static  String getTitleField(){
+
+        public static String getTitleField() {
             return null;
-       }
-       public static  Integer getPagesField(){
+        }
+
+        public static Integer getPagesField() {
             return null;
-       }
+        }
     }
 }

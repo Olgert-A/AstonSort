@@ -11,6 +11,7 @@ import java.time.Year;
 import java.util.List;
 
 import java.io.*;
+
 import data.util.Validate;
 
 import java.io.BufferedReader;
@@ -22,15 +23,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
-import data.entities.Korneplod;
-import data.search.BinarySearch;
-import view.CarFieldEnum;
-import view.KorneplodFieldEnum;
-import view.ViewRepresentationEnum;
 
-import java.time.Year;
-import java.util.Comparator;
-import java.util.List;
 
 public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     @Override
@@ -48,7 +41,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             strUserInput = getValue(String.class, CarFieldEnum.MODEL.getLocaleName(),
                     Objects::nonNull, "Модель неверная");
 
-            if(strUserInput == null) {
+            if (strUserInput == null) {
                 System.out.println("Не удалось считать модель, ввод объекта будет пропущен");
                 continue;
             } else
@@ -134,13 +127,13 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             int counter = 0;
             Validate<String> modelValidator = v -> v.length() > 2;
             Validate<Integer> powerValidator = v -> v > 100;
-            Validate <Integer> productionYearValidator = v -> v > 2000 && v < 2025;
+            Validate<Integer> productionYearValidator = v -> v > 2000 && v < 2025;
             String model = null;
             int power = 0, productionYear = 0;
             boolean startFlag = false;
 
-            while((line = bufferedReader.readLine()) != null && counter < amount) {
-                if (line.trim().startsWith("[")){
+            while ((line = bufferedReader.readLine()) != null && counter < amount) {
+                if (line.trim().startsWith("[")) {
                     startFlag = true;
                     model = null;
                     power = 0;
@@ -151,7 +144,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                     startFlag = false;
                     if (model != null && power != 0 & productionYear != 0) {
                         if (modelValidator.isValid(model) && powerValidator.isValid(power)
-                                && productionYearValidator.isValid(productionYear)){
+                                && productionYearValidator.isValid(productionYear)) {
                             Car car = new Car.CarBuilder()
                                     .setModel(model)
                                     .setPower(power)
@@ -159,8 +152,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                                     .build();
                             rawData.add(car);
                             counter++;
-                        }
-                        else {
+                        } else {
                             System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
@@ -187,8 +179,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 System.out.println("Файл закончился раньше, чем массив заполнился");
             }
             return true;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
         return false;
@@ -214,7 +205,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             }
             bufferedReader.close();
             List<Car> carList = processedData;
-            for (Car car:carList) {
+            for (Car car : carList) {
                 bufferedWriter.write("[");
                 bufferedWriter.newLine();
                 bufferedWriter.write("Model: ");
@@ -279,45 +270,28 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
     }
 
     @Override
-    public void searchByField(ViewRepresentationEnum field, Number fieldValue) {
+    public boolean search() {
+        CarFieldEnum searchField = ConsoleUtil.getSearchField();
 
-    }
-
-    private static class ConsoleUtil {
-        public static CarFieldEnum getSortField() throws Exception {
-            CarFieldEnum sortField;
-            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
-            int fieldAmount = CarFieldEnum.values().length;
-
-            for (var field : CarFieldEnum.values())
-                requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
-
-            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
-                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
-    }
-    @Override
-    public boolean search (){
-        CarFieldEnum searchField = CarStrategy.CarConsoleUtil.getSearchField();
-
-        if (searchField == null){
+        if (searchField == null) {
             System.out.println("No search field found");
             return false;
         }
         Car searchValue = getSearchValue(searchField);
-        if (searchValue != null){
-            System.out.println( "что-то пошло не так");
+        if (searchValue != null) {
+            System.out.println("что-то пошло не так");
             return false;
         }
-        Comparator <Car> comparator = getFieldComparator(searchField);
-        if (comparator == null){
+        Comparator<Car> comparator = getFieldComparator(searchField);
+        if (comparator == null) {
 
             System.out.println("Компаратор не найден!");
             return false;
         }
-        List<Car> sortedData = this.sortAlgorithm(this.rawData, comparator);
+        List<Car> sortedData = this.sortAlgorithm.sort(this.rawData, comparator);
         Car result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
 
-        if (result == null){
+        if (result == null) {
             return false;
         }
         this.processedData.clear();
@@ -326,49 +300,26 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
     }
 
-    private List<Korneplod> sortAlgorithm(List<Korneplod> rawData, Comparator<Korneplod> comparator) {
-        return null;
-    }
-
-    private Comparator<Car> getFieldComparator(CarFieldEnum field) {
-
-        switch (field) {
-            case MODEL ->{
-                return Comparator.comparing(Car::getModel);
-            }
-            case POWER ->{
-                return Comparator.comparing(Car::getPower);
-            }
-            case YEAR ->{
-                return Comparator.comparing(Car::getProductionYear);
-            }
-            default ->
-            {
-                return null;
-            }
-        }
-
-    }
-    private Car getSearchValue (CarFieldEnum searchField) {
-       Car.CarBuilder builder = new Car.CarBuilder();
+    private Car getSearchValue(CarFieldEnum searchField) {
+        Car.CarBuilder builder = new Car.CarBuilder();
         switch (searchField) {
-            case MODEL->{
-                String model = CarConsoleUtil.getModel();
+            case MODEL -> {
+                String model = ConsoleUtil.getModel();
                 if (model == null) {
                     return null;
                 }
                 return builder.setModel(model).build();
             }
-            case POWER ->{
-                Integer power = CarConsoleUtil.getPower();
+            case POWER -> {
+                Integer power = ConsoleUtil.getPower();
                 if (power == null) {
                     return null;
                 }
                 return builder.setPower(power).build();
             }
-            case YEAR ->{
+            case YEAR -> {
 
-                Integer year  = CarStrategy.CarConsoleUtil.getProductionYear();
+                Integer year = ConsoleUtil.getProductionYear();
                 if (year == null) {
                     return null;
                 }
@@ -384,8 +335,18 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
         }
 
     }
-    @Override
-    public void showResultsData() {
+
+    private static class ConsoleUtil {
+        public static CarFieldEnum getSortField() throws Exception {
+            CarFieldEnum sortField;
+            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
+            int fieldAmount = CarFieldEnum.values().length;
+
+            for (var field : CarFieldEnum.values())
+                requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
+
+            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
 
             if (intUserInput == null) {
                 System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
@@ -394,19 +355,22 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 sortField = CarFieldEnum.values()[intUserInput];
             return sortField;
         }
-    }
-    public static class CarConsoleUtil {
+
         public static CarFieldEnum getSearchField() {
             return null;
         }
+
         public static String getModel() {
             return null;
         }
+
         public static Integer getProductionYear() {
             return null;
         }
+
         public static Integer getPower() {
             return null;
         }
+
     }
 }
