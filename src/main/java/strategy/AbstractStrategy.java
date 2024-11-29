@@ -6,6 +6,7 @@ import data.util.ParityChecker;
 import util.AppUtil;
 import util.enums.SortTypeEnum;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,16 +39,17 @@ public abstract class AbstractStrategy<T> implements Strategy {
             System.out.println(book);
     }
 
-    void sortByField(SortTypeEnum sortType, Comparator<T> comparator, ParityChecker<T> parityChecker) throws Exception {
+    void sortByField(SortTypeEnum sortType,
+                     Comparator<T> comparator,
+                     ParityChecker<T> parityChecker) throws IOException {
         switch (sortType) {
             case SORT -> this.processedData = this.sortAlgorithm.sort(this.rawData, comparator);
             case SORTEVENVALUES -> {
-                if (parityChecker == null) {
-                    System.out.println("Нельзя использовать сортировку четных полей для выбранного поля");
-                    throw new Exception("AbstractStrategy.sortByField()");
-                } else
-                    this.processedData = this.sortAlgorithm.sortEvenValues(this.rawData, comparator, parityChecker);
+                if (parityChecker == null)
+                    throw new IOException("Нельзя использовать сортировку четных полей для выбранного поля");
+
+                this.processedData =  this.sortAlgorithm.sortEvenValues(this.rawData, comparator, parityChecker);
             }
-        }
+        };
     }
 }
