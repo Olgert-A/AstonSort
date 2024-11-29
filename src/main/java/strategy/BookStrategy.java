@@ -9,7 +9,6 @@ import util.enums.SortTypeEnum;
 import java.io.*;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
@@ -66,7 +65,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             if (new BookUtil.BookAuthorValidator().isValid(author) &&
                     new BookUtil.BookTitleValidator().isValid(title) &&
                     new BookUtil.BookPagesValidator().isValid(pages)) {
-                Book book = new Book.BookBuilder().setAuthor(author).setTitle(title).setPages(pages).build();
+
+                Book book = new Book.BookBuilder()
+                        .setAuthor(author)
+                        .setTitle(title)
+                        .setPages(pages)
+                        .build();
                 this.rawData.add(book);
             }
         }
@@ -125,15 +129,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
                 if (startFlag && splitLine.length > 1) {
                     switch (splitLine[0].trim()) {
-                        case "Author" -> {
-                            author = splitLine[1].trim();
-                        }
-                        case "Title" -> {
-                            title = splitLine[1].trim();
-                        }
-                        case "Pages" -> {
-                            pages = Integer.valueOf(splitLine[1].trim(), 10);
-                        }
+                        case "Author" -> author = splitLine[1].trim();
+                        case "Title" -> title = splitLine[1].trim();
+                        case "Pages" -> pages = Integer.valueOf(splitLine[1].trim(), 10);
                     }
                 }
             }
@@ -215,8 +213,11 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
     private ParityChecker<Book> getFieldParityChecker(BookFieldEnum sortField) {
-        if (sortField.equals(BookFieldEnum.PAGES)) return new BookUtil.BookPagesParityCheker();
-        return null;
+        return switch (sortField) {
+            case PAGES -> new BookUtil.BookPagesParityCheker();
+            case null -> throw new IllegalArgumentException("Невозможно выбрать проверку четности для данного поля.");
+            default -> null;
+        };
     }
 
 
@@ -308,7 +309,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
         public static Integer getPagesField() throws IOException {
             Integer pages = getValue(Integer.class, BookFieldEnum.PAGES.getLocaleName(),
-                    Objects::nonNull, "Количество страниц неверное");
+                    new BookUtil.BookPagesValidator(), BookUtil.PAGES_INVALID_TEXT);
 
             if (pages == null)
                 throw new IOException("Не удалось считать количество страниц.");

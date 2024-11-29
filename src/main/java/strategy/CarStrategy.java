@@ -3,23 +3,14 @@ package strategy;
 import data.entities.Car;
 import data.util.CarUtil;
 import data.util.ParityChecker;
-
+import util.enums.BookFieldEnum;
 import util.enums.CarFieldEnum;
 import util.enums.SortTypeEnum;
 
-import java.time.Year;
-import java.util.List;
-
 import java.io.*;
-
-import data.util.Validate;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
+import java.time.Year;
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.List;
 import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
@@ -33,37 +24,16 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
         do {
             String model;
             int power, productionYear;
-            String strUserInput;
-            Integer intUserInput;
 
             System.out.println("\nЗаполните машину №" + carCount);
-
-            strUserInput = getValue(String.class, CarFieldEnum.MODEL.getLocaleName(),
-                    Objects::nonNull, "Модель неверная");
-
-            if (strUserInput == null) {
-                System.out.println("Не удалось считать модель, ввод объекта будет пропущен");
+            try {
+                model = ConsoleUtil.getModelField();
+                power = ConsoleUtil.getPowerField();
+                productionYear = ConsoleUtil.getProductionYearField();
+            } catch (IOException e) {
+                System.out.println(e.getMessage() + " Заполнение машины начнётся с начала");
                 continue;
-            } else
-                model = strUserInput;
-
-            intUserInput = getValue(Integer.class, CarFieldEnum.POWER.getLocaleName(),
-                    Objects::nonNull, "Мощность неверна");
-
-            if (intUserInput == null) {
-                System.out.println("Не удалось считать мощность, ввод объекта будет пропущен");
-                continue;
-            } else
-                power = intUserInput;
-
-            intUserInput = getValue(Integer.class, CarFieldEnum.YEAR.getLocaleName(),
-                    Objects::nonNull, "Год выпуска неверен");
-
-            if (intUserInput == null) {
-                System.out.println("Не удалось считать год выпуска, ввод объекта будет пропущен");
-                continue;
-            } else
-                productionYear = intUserInput;
+            }
 
             Car car = new Car.CarBuilder()
                     .setModel(model)
@@ -72,8 +42,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                     .build();
 
             this.rawData.add(car);
-            carCount++;
-        } while (carCount < amount);
+        } while (++carCount < amount);
 
         return true;
     }
@@ -98,9 +67,15 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             power = minPower + random.nextInt(maxPower - minPower + 1);
             year = minYear + random.nextInt(maxYear - minYear + 1);
 
-            if (new CarUtil.CarModelValidator().isValid(model) && new CarUtil.CarPowerValidator().isValid(power)
-                    && new CarUtil.CarProductionYearValidator().isValid(year)) {
-                Car car = new Car.CarBuilder().setModel(model).setPower(power).setProductionYear(year).build();
+            if (new CarUtil.CarModelValidator().isValid(model) &&
+                    new CarUtil.CarPowerValidator().isValid(power) &&
+                    new CarUtil.CarProductionYearValidator().isValid(year)) {
+
+                Car car = new Car.CarBuilder()
+                        .setModel(model)
+                        .setPower(power)
+                        .setProductionYear(year)
+                        .build();
                 this.rawData.add(car);
             }
         }
@@ -125,9 +100,6 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             }
 
             int counter = 0;
-            Validate<String> modelValidator = v -> v.length() > 2;
-            Validate<Integer> powerValidator = v -> v > 100;
-            Validate<Integer> productionYearValidator = v -> v > 2000 && v < 2025;
             String model = null;
             int power = 0, productionYear = 0;
             boolean startFlag = false;
@@ -143,8 +115,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 if (line.trim().endsWith("]")) {
                     startFlag = false;
                     if (model != null && power != 0 & productionYear != 0) {
-                        if (modelValidator.isValid(model) && powerValidator.isValid(power)
-                                && productionYearValidator.isValid(productionYear)) {
+                        if (new CarUtil.CarModelValidator().isValid(model) &&
+                                new CarUtil.CarPowerValidator().isValid(power) &&
+                                new CarUtil.CarProductionYearValidator().isValid(productionYear)) {
                             Car car = new Car.CarBuilder()
                                     .setModel(model)
                                     .setPower(power)
@@ -162,15 +135,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
                 if (startFlag && splitLine.length > 1) {
                     switch (splitLine[0].trim()) {
-                        case "Model" -> {
-                            model = splitLine[1].trim();
-                        }
-                        case "Power" -> {
-                            power = Integer.valueOf(splitLine[1].trim());
-                        }
-                        case "Production year" -> {
-                            productionYear = Integer.valueOf(splitLine[1].trim(), 10);
-                        }
+                        case "Model" -> model = splitLine[1].trim();
+                        case "Power" -> power = Integer.parseInt(splitLine[1].trim());
+                        case "Production year" -> productionYear = Integer.valueOf(splitLine[1].trim(), 10);
                     }
                 }
             }
@@ -212,10 +179,10 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 bufferedWriter.write(car.getModel());
                 bufferedWriter.newLine();
                 bufferedWriter.write("Power: ");
-                bufferedWriter.write(car.getPower());
+                bufferedWriter.write(String.valueOf(car.getPower()));
                 bufferedWriter.newLine();
                 bufferedWriter.write("Production year: ");
-                bufferedWriter.write(car.getProductionYear());
+                bufferedWriter.write(String.valueOf(car.getProductionYear()));
                 bufferedWriter.newLine();
                 bufferedWriter.write("]");
                 bufferedWriter.newLine();
@@ -233,61 +200,50 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
         try {
             CarFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            return false;
         }
+
         return true;
     }
 
     private Comparator<Car> getFieldComparator(CarFieldEnum sortField) {
-        switch (sortField) {
-            case MODEL -> {
-                return new CarUtil.CarModelComparator();
-            }
-            case YEAR -> {
-                return new CarUtil.CarYearComparator();
-            }
-            case POWER -> {
-                return new CarUtil.CarPowerComparator();
-            }
-            case ALL -> {
-                return new CarUtil.CarGeneralComparator();
-            }
-        }
-        return null;
+        return switch (sortField) {
+            case MODEL -> new CarUtil.CarModelComparator();
+            case YEAR -> new CarUtil.CarYearComparator();
+            case POWER -> new CarUtil.CarPowerComparator();
+            case ALL -> new CarUtil.CarGeneralComparator();
+            case null, default -> throw new IllegalArgumentException("Невозможно выбрать компаратор для данного поля.");
+        };
     }
 
     private ParityChecker<Car> getFieldParityChecker(CarFieldEnum sortField) {
-        switch (sortField) {
-            case YEAR -> {
-                return new CarUtil.CarProductionYearParityCheker();
-            }
-            case POWER -> {
-                return new CarUtil.CarPowerParityCheker();
-            }
-        }
-        return null;
+        return switch (sortField) {
+            case YEAR -> new CarUtil.CarProductionYearParityCheker();
+            case POWER -> new CarUtil.CarPowerParityCheker();
+            case null -> throw new IllegalArgumentException("Невозможно выбрать проверку четности для данного поля.");
+            default -> null;
+        };
     }
 
     @Override
     public boolean search() {
-        CarFieldEnum searchField = ConsoleUtil.getSearchField();
+        CarFieldEnum searchField;
+        Car searchValue;
+        Comparator<Car> comparator;
 
-        if (searchField == null) {
-            System.out.println("No search field found");
+        try {
+            searchField = ConsoleUtil.getSearchField();
+            searchValue = getSearchValue(searchField);
+            comparator = getFieldComparator(searchField);
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            return false;
+        } catch (IllegalArgumentException e) {
             return false;
         }
-        Car searchValue = getSearchValue(searchField);
-        if (searchValue != null) {
-            System.out.println("что-то пошло не так");
-            return false;
-        }
-        Comparator<Car> comparator = getFieldComparator(searchField);
-        if (comparator == null) {
 
-            System.out.println("Компаратор не найден!");
-            return false;
-        }
         List<Car> sortedData = this.sortAlgorithm.sort(this.rawData, comparator);
         Car result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
 
@@ -300,77 +256,87 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
 
     }
 
-    private Car getSearchValue(CarFieldEnum searchField) {
-        Car.CarBuilder builder = new Car.CarBuilder();
-        switch (searchField) {
+    private Car getSearchValue(CarFieldEnum searchField) throws IOException {
+        Car.CarBuilder builder;
+
+        builder = switch (searchField) {
             case MODEL -> {
-                String model = ConsoleUtil.getModel();
-                if (model == null) {
-                    return null;
-                }
-                return builder.setModel(model).build();
+                String model = ConsoleUtil.getModelField();
+                yield new Car.CarBuilder().setModel(model);
             }
             case POWER -> {
-                Integer power = ConsoleUtil.getPower();
-                if (power == null) {
-                    return null;
-                }
-                return builder.setPower(power).build();
+                Integer power = ConsoleUtil.getPowerField();
+                yield new Car.CarBuilder().setPower(power);
             }
             case YEAR -> {
+                Integer year = ConsoleUtil.getProductionYearField();
+                yield new Car.CarBuilder().setProductionYear(year);
+            }
+            case ALL -> throw new IOException("Поиск возможен только по одиночному полю.");
+            case null, default -> null;
+        };
 
-                Integer year = ConsoleUtil.getProductionYear();
-                if (year == null) {
-                    return null;
-                }
-                return builder.setProductionYear(year).build();
-            }
-            case ALL -> {
-                System.out.println("нельзя искать всё!");
-                return null;
-            }
-            default -> {
-                return null;
-            }
-        }
+        if (builder == null)
+            throw new IOException("Корректное поле для поиска не было выбрано.");
 
+        return builder.build();
     }
 
     private static class ConsoleUtil {
-        public static CarFieldEnum getSortField() throws Exception {
-            CarFieldEnum sortField;
-            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
-            int fieldAmount = CarFieldEnum.values().length;
+        public static CarFieldEnum getSortField() throws IOException {
+            return getCarField("сортировки");
+        }
 
-            for (var field : CarFieldEnum.values())
+        public static CarFieldEnum getSearchField() throws IOException {
+            return getCarField("поиска");
+        }
+
+        public static String getModelField() throws IOException {
+            String model = getValue(String.class, CarFieldEnum.MODEL.getLocaleName(),
+                    new CarUtil.CarModelValidator(), CarUtil.MODEL_INVALID_TEXT);
+
+            if (model == null)
+                throw new IOException("Не удалось считать модель.");
+
+            return model;
+        }
+
+        public static Integer getPowerField() throws IOException {
+            Integer power = getValue(Integer.class, CarFieldEnum.POWER.getLocaleName(),
+                    new CarUtil.CarPowerValidator(), CarUtil.POWER_INVALID_TEXT);
+
+            if (power == null)
+                throw new IOException("Не удалось считать мощность.");
+
+            return power;
+        }
+
+        public static Integer getProductionYearField() throws IOException {
+            Integer year = getValue(Integer.class, CarFieldEnum.YEAR.getLocaleName(),
+                    new CarUtil.CarProductionYearValidator(), CarUtil.YEAR_INVALID_TEXT);
+
+            if (year == null)
+                throw new IOException("Не удалось считать год выпуска.");
+
+            return year;
+        }
+
+        private static CarFieldEnum getCarField(String fieldUsage) throws IOException {
+            CarFieldEnum[] values = CarFieldEnum.values();
+            final int minOrdinal = values[0].ordinal();
+            final int maxOrdinal = values[values.length - 1].ordinal();
+
+            StringBuilder requestTextBuilder = new StringBuilder("Выберите поля " + fieldUsage + ":");
+            for (var field : BookFieldEnum.values())
                 requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
 
-            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
-                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
+            Integer userInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= minOrdinal && v <= maxOrdinal, util.ConsoleUtil.CHOICE_INVALID_TEXT);
 
-            if (intUserInput == null) {
-                System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
-                throw new Exception("return false");
-            } else
-                sortField = CarFieldEnum.values()[intUserInput];
-            return sortField;
+            if (userInput == null)
+                throw new IOException("Не удалось выбрать поля " + fieldUsage + ".");
+
+            return CarFieldEnum.values()[userInput];
         }
-
-        public static CarFieldEnum getSearchField() {
-            return null;
-        }
-
-        public static String getModel() {
-            return null;
-        }
-
-        public static Integer getProductionYear() {
-            return null;
-        }
-
-        public static Integer getPower() {
-            return null;
-        }
-
     }
 }
