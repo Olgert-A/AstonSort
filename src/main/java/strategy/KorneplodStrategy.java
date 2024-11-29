@@ -1,22 +1,19 @@
 package strategy;
 
 import data.entities.Korneplod;
-
 import data.util.KorneplodUtil;
-
 import data.util.ParityChecker;
-import data.util.Validate;
-
 import util.enums.KorneplodFieldEnum;
 import util.enums.SortTypeEnum;
+
 
 import java.io.*;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
+import static util.enums.ViewOrdinalUtil.*;
 
 
 public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements Strategy {
@@ -27,37 +24,16 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
         do {
             String type, color;
             double weight;
-            String strUserInput;
-            Double doubleUserInput;
 
             System.out.println("\nЗаполните кореплод №" + korneplodCount);
-
-            strUserInput = getValue(String.class, KorneplodFieldEnum.TYPE.getLocaleName(),
-                    Objects::nonNull, "Тип неверный");
-
-            if (strUserInput == null) {
-                System.out.println("Не удалось считать тип, ввод объекта будет пропущен");
+            try {
+                type = ConsoleUtil.getType();
+                weight = ConsoleUtil.getWeight();
+                color = ConsoleUtil.getColor();
+            } catch (IOException e) {
+                System.out.println(e.getMessage() + " Заполнение книги начнётся с начала");
                 continue;
-            } else
-                type = strUserInput;
-
-            doubleUserInput = getValue(Double.class, KorneplodFieldEnum.WEIGHT.getLocaleName(),
-                    Objects::nonNull, "Вес неверный");
-
-            if (doubleUserInput == null) {
-                System.out.println("Не удалось считать вес, ввод объекта будет пропущен");
-                continue;
-            } else
-                weight = doubleUserInput;
-
-            strUserInput = getValue(String.class, KorneplodFieldEnum.COLOR.getLocaleName(),
-                    Objects::nonNull, "цвет неверный");
-
-            if (strUserInput == null) {
-                System.out.println("Не удалось считать цвет, ввод объекта будет пропущен");
-                continue;
-            } else
-                color = strUserInput;
+            }
 
             Korneplod korneplod = new Korneplod.KorneplodBuilder()
                     .setType(type)
@@ -66,8 +42,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                     .build();
 
             this.rawData.add(korneplod);
-            korneplodCount++;
-        } while (korneplodCount < amount);
+        } while (++korneplodCount < amount);
 
         return true;
     }
@@ -91,9 +66,15 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             color = colorList.get(random.nextInt(colorList.size()));
             weight = minWeight + random.nextDouble(maxWeight - minWeight + 1);
 
-            if (new KorneplodUtil.KorneplodTypeValidator().isValid(type) && new KorneplodUtil.KorneplodColorValidator().isValid(color)
-                    && new KorneplodUtil.KorneplodWeightValidator().isValid(weight)) {
-                Korneplod korneplod = new Korneplod.KorneplodBuilder().setType(type).setColor(color).setWeight(weight).build();
+            if (new KorneplodUtil.KorneplodTypeValidator().isValid(type) &&
+                    new KorneplodUtil.KorneplodColorValidator().isValid(color) &&
+                    new KorneplodUtil.KorneplodWeightValidator().isValid(weight)) {
+
+                Korneplod korneplod = new Korneplod.KorneplodBuilder()
+                        .setType(type)
+                        .setColor(color)
+                        .setWeight(weight)
+                        .build();
                 this.rawData.add(korneplod);
             }
         }
@@ -118,8 +99,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             }
 
             int counter = 0;
-            Validate<String> typeAndColorValidator = v -> v.length() > 5;
-            Validate<Double> weightValidator = v -> v > 0;
             String type = null, color = null;
             double weight = 0;
             boolean startFlag = false;
@@ -135,8 +114,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 if (line.trim().endsWith("]")) {
                     startFlag = false;
                     if (type != null && color != null & weight != 0) {
-                        if (typeAndColorValidator.isValid(type) && weightValidator.isValid(weight)
-                                && typeAndColorValidator.isValid(color)) {
+                        if (new KorneplodUtil.KorneplodTypeValidator().isValid(type) && new KorneplodUtil.KorneplodWeightValidator().isValid(weight) && new KorneplodUtil.KorneplodColorValidator().isValid(color)) {
                             Korneplod korneplod = new Korneplod.KorneplodBuilder()
                                     .setType(type)
                                     .setWeight(weight)
@@ -154,15 +132,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
                 if (startFlag && splitLine.length > 1) {
                     switch (splitLine[0].trim()) {
-                        case "Type" -> {
-                            type = splitLine[1].trim();
-                        }
-                        case "Weight" -> {
-                            weight = Double.valueOf(splitLine[1].trim());
-                        }
-                        case "Color" -> {
-                            color = splitLine[1].trim();
-                        }
+                        case "Type" -> type = splitLine[1].trim();
+                        case "Weight" -> weight = Double.parseDouble(splitLine[1].trim());
+                        case "Color" -> color = splitLine[1].trim();
                     }
                 }
             }
@@ -225,31 +197,31 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
         try {
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            return false;
         }
+
         return true;
     }
 
     @Override
     public boolean search() {
-        KorneplodFieldEnum searchField = ConsoleUtil.getSearchField();
+        KorneplodFieldEnum searchField;
+        Korneplod searchValue;
+        Comparator<Korneplod> comparator;
 
-        if (searchField == null) {
-            System.out.println("No search field found");
+        try {
+            searchField = ConsoleUtil.getSearchField();
+            searchValue = getSearchValue(searchField);
+            comparator = getFieldComparator(searchField);
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            return false;
+        } catch (IllegalArgumentException e) {
             return false;
         }
-        Korneplod searchValue = getSearchValue(searchField);
-        if (searchValue != null) {
-            System.out.println("что-то пошло не так");
-            return false;
-        }
-        Comparator<Korneplod> comparator = getFieldComparator(searchField);
-        if (comparator == null) {
 
-            System.out.println("Компаратор не найден!");
-            return false;
-        }
         List<Korneplod> sortedData = this.sortAlgorithm.sort(this.rawData, comparator);
         Korneplod result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
 
@@ -263,96 +235,104 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
     }
 
     private Comparator<Korneplod> getFieldComparator(KorneplodFieldEnum sortField) {
-        switch (sortField) {
-            case TYPE -> {
-                return new KorneplodUtil.KorneplodTypeComparator();
-            }
-            case COLOR -> {
-                return new KorneplodUtil.KorneplodColorComparator();
-            }
-            case WEIGHT -> {
-                return new KorneplodUtil.KorneplodWeightComparator();
-            }
-            case ALL -> {
-                return new KorneplodUtil.KorneplodGeneralComparator();
-            }
-        }
-        return null;
+        return switch (sortField) {
+            case TYPE -> new KorneplodUtil.KorneplodTypeComparator();
+            case COLOR -> new KorneplodUtil.KorneplodColorComparator();
+            case WEIGHT -> new KorneplodUtil.KorneplodWeightComparator();
+            case ALL -> new KorneplodUtil.KorneplodGeneralComparator();
+            case null, default -> throw new IllegalArgumentException("Невозможно выбрать компаратор для данного поля.");
+        };
     }
 
     private ParityChecker<Korneplod> getFieldParityChecker(KorneplodFieldEnum sortField) {
-        return null;
+        return switch (sortField) {
+            case null -> throw new IllegalArgumentException("Невозможно выбрать проверку четности для данного поля.");
+            default -> null;
+        };
     }
 
-    private Korneplod getSearchValue(KorneplodFieldEnum searchField) {
-        Korneplod.KorneplodBuilder builder = new Korneplod.KorneplodBuilder();
-        switch (searchField) {
+    private Korneplod getSearchValue(KorneplodFieldEnum searchField) throws IOException {
+        Korneplod.KorneplodBuilder builder;
+
+        builder = switch (searchField) {
             case TYPE -> {
                 String type = ConsoleUtil.getType();
-                if (type == null) {
-                    return null;
-                }
-                return builder.setType(type).build();
+                yield new Korneplod.KorneplodBuilder().setType(type);
             }
             case COLOR -> {
                 String color = ConsoleUtil.getColor();
-                if (color == null) {
-                    return null;
-                }
-                return builder.setColor(color).build();
+                yield new Korneplod.KorneplodBuilder().setColor(color);
             }
             case WEIGHT -> {
                 Double weight = ConsoleUtil.getWeight();
-                if (weight == null) {
-                    return null;
-                }
-                return builder.setWeight(weight).build();
+                yield new Korneplod.KorneplodBuilder().setWeight(weight);
             }
-            case ALL -> {
-                System.out.println("нельзя искать всё!");
-                return null;
-            }
-            default -> {
-                return null;
-            }
-        }
+            case ALL -> throw new IOException("Поиск возможен только по одиночному полю.");
+            case null, default -> null;
+        };
+
+        if (builder == null)
+            throw new IOException("Корректное поле для поиска не было выбрано.");
+
+        return builder.build();
     }
 
 
     private static class ConsoleUtil {
-        public static KorneplodFieldEnum getSortField() throws Exception {
-            KorneplodFieldEnum sortField;
-            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
-            int fieldAmount = KorneplodFieldEnum.values().length;
+        public static KorneplodFieldEnum getSortField() throws IOException {
+            return getKorneplodField("сортировки");
+        }
 
-            for (var field : KorneplodFieldEnum.values())
+        public static KorneplodFieldEnum getSearchField() throws IOException {
+            return getKorneplodField("поиска");
+        }
+
+        public static String getType() throws IOException {
+            String type = getValue(String.class, KorneplodFieldEnum.TYPE.getLocaleName(),
+                    new KorneplodUtil.KorneplodTypeValidator(), KorneplodUtil.TYPE_INVALID_TEXT);
+
+            if (type == null)
+                throw new IOException("Не удалось считать тип.");
+
+            return type;
+        }
+
+        public static Double getWeight() throws IOException {
+            Double weight = getValue(Double.class, KorneplodFieldEnum.WEIGHT.getLocaleName(),
+                    new KorneplodUtil.KorneplodWeightValidator(), KorneplodUtil.WEIGHT_INVALID_TEXT);
+
+            if (weight == null)
+                throw new IOException("Не удалось считать вес");
+
+            return weight;
+        }
+
+        public static String getColor() throws IOException {
+            String color = getValue(String.class, KorneplodFieldEnum.COLOR.getLocaleName(),
+                    new KorneplodUtil.KorneplodColorValidator(), KorneplodUtil.COLOR_INVALID_TEXT);
+
+            if (color == null)
+                throw new IOException("Не удалось считать цвет.");
+
+            return color;
+        }
+
+        private static KorneplodFieldEnum getKorneplodField(String fieldUsage) throws IOException {
+            KorneplodFieldEnum[] values = KorneplodFieldEnum.values();
+            final int minOrdinal = getViewOrdinal(values[0].ordinal());
+            final int maxOrdinal = getViewOrdinal(values[values.length - 1].ordinal());
+
+            StringBuilder requestTextBuilder = new StringBuilder("Выберите поля " + fieldUsage + ":");
+            for (var field : values)
                 requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
 
-            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
-                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
+            Integer userInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= minOrdinal && v <= maxOrdinal, util.ConsoleUtil.CHOICE_INVALID_TEXT);
 
-            if (intUserInput == null) {
-                System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
-                throw new Exception("return false");
-            } else
-                sortField = KorneplodFieldEnum.values()[intUserInput];
-            return sortField;
-        }
+            if (userInput == null)
+                throw new IOException("Не удалось выбрать поля " + fieldUsage + ".");
 
-        public static KorneplodFieldEnum getSearchField() {
-            return null;
-        }
-
-        public static String getType() {
-            return null;
-        }
-
-        public static Double getWeight() {
-            return null;
-        }
-
-        public static String getColor() {
-            return null;
+            return values[getOrdinalBy(userInput)];
         }
     }
 }

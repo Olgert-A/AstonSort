@@ -3,17 +3,16 @@ package strategy;
 import data.entities.Book;
 import data.util.BookUtil;
 import data.util.ParityChecker;
-import data.util.Validate;
 import util.enums.BookFieldEnum;
 import util.enums.SortTypeEnum;
 
 import java.io.*;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static util.ConsoleUtil.getValue;
+import static util.enums.ViewOrdinalUtil.*;
 
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
@@ -25,37 +24,16 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
         do {
             String author, title;
             int pages;
-            String strUserInput;
-            Integer intUserInput;
 
             System.out.println("\nЗаполните книгу №" + booksCount);
-
-            strUserInput = getValue(String.class, BookFieldEnum.AUTHOR.getLocaleName(),
-                    Objects::nonNull, "Автор неверный");
-
-            if (strUserInput == null) {
-                System.out.println("Не удалось считать автора, ввод объекта будет пропущен");
+            try {
+                author = ConsoleUtil.getAuthorField();
+                title = ConsoleUtil.getTitleField();
+                pages = ConsoleUtil.getPagesField();
+            } catch (IOException e) {
+                System.out.println(e.getMessage() + " Заполнение книги начнётся с начала");
                 continue;
-            } else
-                author = strUserInput;
-
-            strUserInput = getValue(String.class, BookFieldEnum.TITLE.getLocaleName(),
-                    Objects::nonNull, "Название неверное");
-
-            if (strUserInput == null) {
-                System.out.println("Не удалось считать название книги, ввод объекта будет пропущен");
-                continue;
-            } else
-                title = strUserInput;
-
-            intUserInput = getValue(Integer.class, BookFieldEnum.PAGES.getLocaleName(),
-                    Objects::nonNull, "Количество страниц неверное");
-
-            if (intUserInput == null) {
-                System.out.println("Не удалось считать количество страниц, ввод объекта будет пропущен");
-                continue;
-            } else
-                pages = intUserInput;
+            }
 
             Book book = new Book.BookBuilder()
                     .setAuthor(author)
@@ -64,8 +42,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                     .build();
 
             this.rawData.add(book);
-            booksCount++;
-        } while (booksCount < amount);
+        } while (++booksCount < amount);
 
         return true;
     }
@@ -89,7 +66,12 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             if (new BookUtil.BookAuthorValidator().isValid(author) &&
                     new BookUtil.BookTitleValidator().isValid(title) &&
                     new BookUtil.BookPagesValidator().isValid(pages)) {
-                Book book = new Book.BookBuilder().setAuthor(author).setTitle(title).setPages(pages).build();
+
+                Book book = new Book.BookBuilder()
+                        .setAuthor(author)
+                        .setTitle(title)
+                        .setPages(pages)
+                        .build();
                 this.rawData.add(book);
             }
         }
@@ -113,9 +95,6 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             }
 
             int counter = 0;
-            Validate<String> authorValidator = v -> v.length() > 5;
-            Validate<String> titleValidator = v -> v.length() > 3;
-            Validate<Integer> pagesValidator = v -> v > 1;
             String author = null, title = null;
             int pages = 0;
             boolean startFlag = false;
@@ -131,8 +110,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 if (line.trim().endsWith("]")) {
                     startFlag = false;
                     if (author != null && title != null & pages != 0) {
-                        if (authorValidator.isValid(author) && titleValidator.isValid(title)
-                                && pagesValidator.isValid(pages)) {
+                        if (new BookUtil.BookAuthorValidator().isValid(author) &&
+                                new BookUtil.BookTitleValidator().isValid(title) &&
+                                new BookUtil.BookPagesValidator().isValid(pages)) {
                             Book book = new Book.BookBuilder()
                                     .setAuthor(author)
                                     .setTitle(title)
@@ -150,15 +130,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
                 if (startFlag && splitLine.length > 1) {
                     switch (splitLine[0].trim()) {
-                        case "Author" -> {
-                            author = splitLine[1].trim();
-                        }
-                        case "Title" -> {
-                            title = splitLine[1].trim();
-                        }
-                        case "Pages" -> {
-                            pages = Integer.valueOf(splitLine[1].trim(), 10);
-                        }
+                        case "Author" -> author = splitLine[1].trim();
+                        case "Title" -> title = splitLine[1].trim();
+                        case "Pages" -> pages = Integer.valueOf(splitLine[1].trim(), 10);
                     }
                 }
             }
@@ -203,7 +177,7 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 bufferedWriter.write(book.getTitle());
                 bufferedWriter.newLine();
                 bufferedWriter.write("Pages: ");
-                bufferedWriter.write(book.getPages());
+                bufferedWriter.write(String.valueOf(book.getPages()));
                 bufferedWriter.newLine();
                 bufferedWriter.write("]");
                 bufferedWriter.newLine();
@@ -221,61 +195,56 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
         try {
             BookFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            return false;
         }
+
         return true;
     }
 
     private Comparator<Book> getFieldComparator(BookFieldEnum sortField) {
-        switch (sortField) {
-            case AUTHOR -> {
-                return new BookUtil.BookAuthorComparator();
-            }
-            case TITLE -> {
-                return new BookUtil.BookTitleComparator();
-            }
-            case PAGES -> {
-                return new BookUtil.BookPagesComparator();
-            }
-            case ALL -> {
-                return new BookUtil.BookGeneralComparator();
-            }
-        }
-        return null;
+        return switch (sortField) {
+            case AUTHOR -> new BookUtil.BookAuthorComparator();
+            case TITLE -> new BookUtil.BookTitleComparator();
+            case PAGES -> new BookUtil.BookPagesComparator();
+            case ALL -> new BookUtil.BookGeneralComparator();
+            case null, default -> throw new IllegalArgumentException("Невозможно выбрать компаратор для данного поля.");
+        };
     }
 
     private ParityChecker<Book> getFieldParityChecker(BookFieldEnum sortField) {
-        if (sortField.equals(BookFieldEnum.PAGES)) return new BookUtil.BookPagesParityCheker();
-        return null;
+        return switch (sortField) {
+            case PAGES -> new BookUtil.BookPagesParityCheker();
+            case null -> throw new IllegalArgumentException("Невозможно выбрать проверку четности для данного поля.");
+            default -> null;
+        };
     }
 
 
     @Override
     public boolean search() {
-        BookFieldEnum searchField = ConsoleUtil.getSearchField();
+        BookFieldEnum searchField;
+        Book searchValue;
+        Comparator<Book> comparator;
 
-        if (searchField == null) {
-            System.out.println("No search field found");
+        try {
+            searchField = ConsoleUtil.getSearchField();
+            searchValue = getSearchValue(searchField);
+            comparator = getFieldComparator(searchField);
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            return false;
+        } catch (IllegalArgumentException e) {
             return false;
         }
-        Book searchValue = getSearchValue(searchField);
-        if (searchValue != null) {
-            System.out.println("что-то пошло не так");
-            return false;
-        }
-        Comparator<Book> comparator = getFieldComparator(searchField);
-        if (comparator == null) {
 
-            System.out.println("Компаратор не найден!");
-            return false;
-        }
         List<Book> sortedData = this.sortAlgorithm.sort(this.rawData, comparator);
         Book result = this.searchAlgorithm.findByField(sortedData, searchValue, comparator);
 
-        if (result == null) {
+        if (result == null)
             return false;
-        }
+
         this.processedData.clear();
         this.processedData.add(result);
         return true;
@@ -283,76 +252,88 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
     }
 
 
-    private Book getSearchValue(BookFieldEnum searchField) {
-        Book.BookBuilder builder = new Book.BookBuilder();
-        switch (searchField) {
+    private Book getSearchValue(BookFieldEnum searchField) throws IOException {
+        Book.BookBuilder builder;
+
+        builder = switch (searchField) {
             case AUTHOR -> {
                 String author = ConsoleUtil.getAuthorField();
-                if (author == null) {
-                    return null;
-                }
-                return builder.setAuthor(author).build();
+                yield new Book.BookBuilder().setAuthor(author);
             }
             case TITLE -> {
                 String title = ConsoleUtil.getTitleField();
-                if (title == null) {
-                    return null;
-                }
-                return builder.setTitle(title).build();
+                yield new Book.BookBuilder().setTitle(title);
             }
             case PAGES -> {
                 Integer pages = ConsoleUtil.getPagesField();
-                if (pages == null) {
-                    return null;
-                }
-                return builder.setPages(pages).build();
+                yield new Book.BookBuilder().setPages(pages);
             }
-            case ALL -> {
-                System.out.println("нельзя искать всё!");
-                return null;
-            }
-            default -> {
-                return null;
-            }
-        }
+            case ALL -> throw new IOException("Поиск возможен только по одиночному полю.");
+            case null, default -> null;
+        };
 
+        if (builder == null)
+            throw new IOException("Корректное поле для поиска не было выбрано.");
+
+        return builder.build();
     }
 
 
     private static class ConsoleUtil {
+        public static BookFieldEnum getSortField() throws IOException {
+            return getBookField("сортировки");
+        }
 
-        public static BookFieldEnum getSortField() throws Exception {
-            BookFieldEnum sortField;
-            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
-            int fieldAmount = BookFieldEnum.values().length;
-            for (var field : BookFieldEnum.values())
+        public static BookFieldEnum getSearchField() throws IOException {
+            return getBookField("поиска");
+        }
+
+        public static String getAuthorField() throws IOException {
+            String author = getValue(String.class, BookFieldEnum.AUTHOR.getLocaleName(),
+                    new BookUtil.BookAuthorValidator(), BookUtil.AUTHOR_INVALID_TEXT);
+
+            if (author == null)
+                throw new IOException("Не удалось считать автора.");
+
+            return author;
+        }
+
+        public static String getTitleField() throws IOException {
+            String title = getValue(String.class, BookFieldEnum.TITLE.getLocaleName(),
+                    new BookUtil.BookTitleValidator(), BookUtil.TITLE_INVALID_TEXT);
+
+            if (title == null)
+                throw new IOException("Не удалось считать название книги.");
+
+            return title;
+        }
+
+        public static Integer getPagesField() throws IOException {
+            Integer pages = getValue(Integer.class, BookFieldEnum.PAGES.getLocaleName(),
+                    new BookUtil.BookPagesValidator(), BookUtil.PAGES_INVALID_TEXT);
+
+            if (pages == null)
+                throw new IOException("Не удалось считать количество страниц.");
+
+            return pages;
+        }
+
+        private static BookFieldEnum getBookField(String fieldUsage) throws IOException {
+            BookFieldEnum[] values = BookFieldEnum.values();
+            final int minOrdinal = getViewOrdinal(values[0].ordinal());
+            final int maxOrdinal = getViewOrdinal(values[values.length - 1].ordinal());
+
+            StringBuilder requestTextBuilder = new StringBuilder("Выберите поля " + fieldUsage + ":");
+            for (var field : values)
                 requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
 
-            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
-                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
+            Integer userInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= minOrdinal && v <= maxOrdinal, util.ConsoleUtil.CHOICE_INVALID_TEXT);
 
-            if (intUserInput == null) {
-                System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
-                throw new Exception("return false");
-            } else
-                sortField = BookFieldEnum.values()[intUserInput];
-            return sortField;
-        }
+            if (userInput == null)
+                throw new IOException("Не удалось выбрать поля " + fieldUsage + ".");
 
-        public static BookFieldEnum getSearchField() {
-            return null;
-        }
-
-        public static String getAuthorField() {
-            return null;
-        }
-
-        public static String getTitleField() {
-            return null;
-        }
-
-        public static Integer getPagesField() {
-            return null;
+            return values[getOrdinalBy(userInput)];
         }
     }
 }
