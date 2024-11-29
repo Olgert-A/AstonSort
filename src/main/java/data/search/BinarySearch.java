@@ -7,8 +7,6 @@ public class BinarySearch<T> implements SearchAlgorithm<T> {
     @Override
     public T findByField(List<T> data, T fieldValue, Comparator<T> comparator) {
 
-        data.sort(comparator);
-
         int left = 0;
         int right = data.size() - 1;
 
