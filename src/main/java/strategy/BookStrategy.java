@@ -14,6 +14,7 @@ import static util.ConsoleUtil.getValue;
 
 import java.io.*;
 import java.util.List;
+import java.util.Random;
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
@@ -71,7 +72,27 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public boolean collectRandomData(int amount) {
+        List<String> authorList = List.of("Samuel", "Winston", "Michael", "Oliver", "Andy", "David", "Jason", "Max");
+        List<String> titleList = List.of("Some book", "Another book", "Best book", "Selling book", "Misery book");
 
+        Random random = new Random();
+
+        String author;
+        String title;
+        int pages;
+
+        while (rawData.size() < amount) {
+            author = authorList.get(random.nextInt(authorList.size()));
+            title = titleList.get(random.nextInt(titleList.size()));
+            pages = random.nextInt(1000);
+
+            if(new BookUtil.BookAuthorValidator().isValid(author) &&
+                    new BookUtil.BookTitleValidator().isValid(title) &&
+                    new BookUtil.BookPagesValidator().isValid(pages)) {
+                Book book = new Book.BookBuilder().setAuthor(author).setTitle(title).setPages(pages).build();
+                this.rawData.add(book);
+            }
+        }
         return true;
     }
 
