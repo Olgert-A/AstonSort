@@ -1,13 +1,15 @@
-package view;
+package util.enums;
 
-public enum ClassReprEnum implements ViewRepresentationEnum {
+import util.ViewRepresentation;
+
+public enum EntityEnum implements ViewRepresentation {
     CAR("Машина"),
     BOOK("Книга"),
     KORNEPLOD("Корнеплод");
 
     private final String localeName;
 
-    ClassReprEnum(String localeName) {
+    EntityEnum(String localeName) {
         this.localeName = localeName;
     }
 
@@ -17,7 +19,7 @@ public enum ClassReprEnum implements ViewRepresentationEnum {
     }
 
     @Override
-    public String getRepresentation() {
+    public String getOrdinalLocaleName() {
         return this.ordinal() +
                 " - " +
                 this.localeName;

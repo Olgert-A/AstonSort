@@ -1,4 +1,4 @@
-package data.comparator;
+package data.util;
 
 @FunctionalInterface
 public interface ParityChecker<T> {

@@ -1,88 +1,265 @@
 package strategy;
 
 import data.entities.Book;
-import data.search.BinarySearch;
-import view.BookFieldEnum;
-import view.ViewRepresentationEnum;
+import data.util.BookUtil;
+import data.util.ParityChecker;
+import data.util.Validate;
+import util.enums.BookFieldEnum;
+import util.enums.SortTypeEnum;
+
+import java.util.Comparator;
+import java.util.Objects;
+
+import static util.ConsoleUtil.getValue;
+
+import java.io.*;
+import java.util.List;
+import java.util.Random;
 
 import java.util.Comparator;
 import java.util.List;
 
 
 public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
-    private BinarySearch<Book> binarySearch = new BinarySearch<>();
 
     @Override
-    public void collectInputData(int amount) {
+    public boolean collectInputData(int amount) {
+        int booksCount = 0;
 
-    }
+        do {
+            String author, title;
+            int pages;
+            String strUserInput;
+            Integer intUserInput;
 
-    @Override
-    public void collectRandomData(int amount) {
+            System.out.println("\nЗаполните книгу №" + booksCount);
 
-    }
+            strUserInput = getValue(String.class, BookFieldEnum.AUTHOR.getLocaleName(),
+                    Objects::nonNull, "Автор неверный");
 
-    @Override
-    public void collectDataFromFile(String name, int amount) {
+            if (strUserInput == null) {
+                System.out.println("Не удалось считать автора, ввод объекта будет пропущен");
+                continue;
+            } else
+                author = strUserInput;
 
-    }
+            strUserInput = getValue(String.class, BookFieldEnum.TITLE.getLocaleName(),
+                    Objects::nonNull, "Название неверное");
 
-    @Override
-    public void saveResultsToFile(String name) {
+            if (strUserInput == null) {
+                System.out.println("Не удалось считать название книги, ввод объекта будет пропущен");
+                continue;
+            } else
+                title = strUserInput;
 
-    }
+            intUserInput = getValue(Integer.class, BookFieldEnum.PAGES.getLocaleName(),
+                    Objects::nonNull, "Количество страниц неверное");
 
-    @Override
-    public void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven) {
+            if (intUserInput == null) {
+                System.out.println("Не удалось считать количество страниц, ввод объекта будет пропущен");
+                continue;
+            } else
+                pages = intUserInput;
 
-    }
-
-    @Override
-    public void sortByAllFields(boolean sortOnlyEven) {
-
-    }
-
-    @Override
-    public <T> void searchByField(ViewRepresentationEnum field, T fieldValue) {
-        if (!(field instanceof BookFieldEnum)) {
-            return;
-        }
-        BookFieldEnum bookFieldEnum = (BookFieldEnum) field;
-
-        if (bookFieldEnum == BookFieldEnum.PAGES ) {
-            if (!(fieldValue instanceof Integer)) {
-                return;
-            }
-            Book searchingBook = new Book.BookBuilder()
-                    .setPages((Integer) fieldValue)
+            Book book = new Book.BookBuilder()
+                    .setAuthor(author)
+                    .setTitle(title)
+                    .setPages(pages)
                     .build();
-            Comparator<Book> comparator = Comparator.comparing(Book::getPages);
-            Book result = binarySearch.findByField(rawData, searchingBook, comparator);
-            System.out.println(result);
-            return;
-        }
-        if (bookFieldEnum == BookFieldEnum.AUTHOR) {
-            if (!(fieldValue instanceof String)) {
-                return;
+
+            this.rawData.add(book);
+            booksCount++;
+        } while (booksCount < amount);
+
+        return true;
+    }
+
+    @Override
+    public boolean collectRandomData(int amount) {
+        List<String> authorList = List.of("Samuel", "Winston", "Michael", "Oliver", "Andy", "David", "Jason", "Max");
+        List<String> titleList = List.of("Some book", "Another book", "Best book", "Selling book", "Misery book");
+
+        Random random = new Random();
+
+        String author;
+        String title;
+        int pages;
+
+        while (rawData.size() < amount) {
+            author = authorList.get(random.nextInt(authorList.size()));
+            title = titleList.get(random.nextInt(titleList.size()));
+            pages = random.nextInt(1000);
+
+            if(new BookUtil.BookAuthorValidator().isValid(author) &&
+                    new BookUtil.BookTitleValidator().isValid(title) &&
+                    new BookUtil.BookPagesValidator().isValid(pages)) {
+                Book book = new Book.BookBuilder().setAuthor(author).setTitle(title).setPages(pages).build();
+                this.rawData.add(book);
             }
-            Book searchingBook = new Book.BookBuilder()
-                    .setAuthor((String) fieldValue)
-                    .build();
-            Comparator<Book> comparator = Comparator.comparing(Book::getAuthor);
-            Book result = binarySearch.findByField(rawData, searchingBook, comparator);
-            System.out.println(result);
-            return;
         }
-        if (bookFieldEnum == BookFieldEnum.TITLE) {
-            if (!(fieldValue instanceof String)) {
-                return;
+        return true;
+    }
+
+    @Override
+    public boolean collectDataFromFile(String name, int amount) {
+        try (FileReader fileReader = new FileReader(name);
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+            String line;
+            line = bufferedReader.readLine();
+            if (line.isEmpty()) {
+                while (line.isEmpty()) {
+                    line = bufferedReader.readLine();
+                }
             }
-            Book searvhingBook = new Book.BookBuilder().setTitle((String) fieldValue).build();
-            Comparator<Book> comparator = Comparator.comparing(Book::getTitle);
-            Book result = binarySearch.findByField(rawData, searvhingBook, comparator);
-            System.out.println(result);
-            return;
+            if (!(line.equals("Books")) || line == null) {
+                System.out.println("Invalid file");
+                return false;
+            }
+
+            int counter = 0;
+            Validate<String> authorValidator = v -> v.length() > 5;
+            Validate<String> titleValidator = v -> v.length() > 3;
+            Validate <Integer> pagesValidator = v -> v > 1;
+            String author = null, title = null;
+            int pages = 0;
+            boolean startFlag = false;
+
+            while((line = bufferedReader.readLine()) != null && counter < amount) {
+                if (line.trim().startsWith("[")){
+                    startFlag = true;
+                    author = null;
+                    title = null;
+                    pages = 0;
+                }
+
+                if (line.trim().endsWith("]")) {
+                    startFlag = false;
+                    if (author != null && title != null & pages != 0) {
+                        if (authorValidator.isValid(author) && titleValidator.isValid(title)
+                            && pagesValidator.isValid(pages)){
+                            Book book = new Book.BookBuilder()
+                                    .setAuthor(author)
+                                    .setTitle(title)
+                                    .setPages(pages)
+                                    .build();
+                            rawData.add(book);
+                            counter++;
+                        }
+                        else {
+                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
+                        }
+                    }
+                }
+
+                String[] splitLine = line.split(":");
+
+                if (startFlag && splitLine.length > 1) {
+                    switch (splitLine[0].trim()) {
+                        case "Author" -> {
+                            author = splitLine[1].trim();
+                        }
+                        case "Title" -> {
+                            title = splitLine[1].trim();
+                        }
+                        case "Pages" -> {
+                            pages = Integer.valueOf(splitLine[1].trim(), 10);
+                        }
+                    }
+                }
+            }
+            bufferedReader.close();
+            if (counter < amount) {
+                System.out.println("Файл закончился раньше, чем массив заполнился");
+            }
+            return true;
         }
+        catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean saveResultsToFile(String name) {
+        try (FileWriter fileWriter = new FileWriter(name);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
+            FileReader fileReader = new FileReader(name);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            if (processedData.isEmpty()) {
+                System.out.println("Нечего записывать в файл.");
+                return false;
+            }
+            String line = bufferedReader.readLine();
+            if (line == null) {
+                bufferedReader.close();
+                bufferedWriter.write("Books");
+                bufferedWriter.newLine();
+            }
+            bufferedReader.close();
+            List<Book> booksList = processedData;
+            for (Book book:booksList) {
+                bufferedWriter.write("[");
+                bufferedWriter.newLine();
+                bufferedWriter.write("Author: ");
+                bufferedWriter.write(book.getAuthor());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Title: ");
+                bufferedWriter.write(book.getTitle());
+                bufferedWriter.newLine();
+                bufferedWriter.write("Pages: ");
+                bufferedWriter.write(book.getPages());
+                bufferedWriter.newLine();
+                bufferedWriter.write("]");
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+            return true;
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean sort(SortTypeEnum sortType) {
+        try {
+            BookFieldEnum sortField = ConsoleUtil.getSortField();
+            sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return true;
+    }
+
+    private Comparator<Book> getFieldComparator(BookFieldEnum sortField) {
+        switch (sortField) {
+            case AUTHOR -> {
+                return new BookUtil.BookAuthorComparator();
+            }
+            case TITLE -> {
+                return new BookUtil.BookTitleComparator();
+            }
+            case PAGES -> {
+                return new BookUtil.BookPagesComparator();
+            }
+            case ALL -> {
+                return new BookUtil.BookGeneralComparator();
+            }
+        }
+        return null;
+    }
+
+    private ParityChecker<Book> getFieldParityChecker(BookFieldEnum sortField) {
+        if (sortField.equals(BookFieldEnum.PAGES)) return new BookUtil.BookPagesParityCheker();
+        return null;
+    }
+
+    @Override
+    public void searchByField(ViewRepresentationEnum field, Number fieldValue) {
+
+    }
 
 
     }
@@ -178,7 +355,25 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
 
     @Override
     public void showResultsData() {
+    private static class ConsoleUtil {
 
+        public static BookFieldEnum getSortField() throws Exception {
+            BookFieldEnum sortField;
+            StringBuilder requestTextBuilder = new StringBuilder("\nВыберите поля сортировки:");
+            int fieldAmount = BookFieldEnum.values().length;
+            for (var field : BookFieldEnum.values())
+                requestTextBuilder.append("\n").append(field.getOrdinalLocaleName());
+
+            Integer intUserInput = getValue(Integer.class, requestTextBuilder.toString(),
+                    v -> v >= 0 && v < fieldAmount, "Значение должно быть от 0 до " + (fieldAmount - 1));
+
+            if (intUserInput == null) {
+                System.out.println("Не удалось выбрать поля сортировки, операция будет прервана!");
+                throw new Exception("return false");
+            } else
+                sortField = BookFieldEnum.values()[intUserInput];
+            return sortField;
+        }
     }
     public static class BookConsoleUtil {
         public static BookFieldEnum getSearchField(){

@@ -1,16 +1,16 @@
 package strategy;
 
-import view.ViewRepresentationEnum;
+import util.enums.SortTypeEnum;
 
 public interface Strategy {
-    void collectInputData(int amount);
-    void collectRandomData(int amount);
-    void collectDataFromFile(String name, int amount);
+    boolean collectInputData(int amount);
+    boolean collectRandomData(int amount);
+    boolean collectDataFromFile(String name, int amount);
 
-    void saveResultsToFile(String name);
-    void showResultsData();
+    boolean saveResultsToFile(String name);
+    void showCollectedData();
+    void showResults();
 
-    void sortBy(ViewRepresentationEnum field, boolean sortOnlyEven);
-    void sortByAllFields(boolean sortOnlyEven);
-     <T> void searchByField(ViewRepresentationEnum field, T fieldValue);
+    boolean sort(SortTypeEnum sortType);
+    boolean search();
 }
