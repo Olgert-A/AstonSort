@@ -2,15 +2,13 @@ package util;
 
 import data.util.Validate;
 
-import util.enums.DataProcessEnum;
-import util.enums.EntityEnum;
-import util.enums.InputTypeEnum;
-
-import util.enums.SortTypeEnum;
+import util.enums.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+
+import static util.enums.ViewOrdinalUtil.*;
 
 public class ConsoleUtil {
     public static final Scanner scanner = new Scanner(System.in);
@@ -26,8 +24,8 @@ public class ConsoleUtil {
 
     public static EntityEnum getDataType() throws IOException {
         EntityEnum[] values = EntityEnum.values();
-        final int minOrdinal = values[0].ordinal();
-        final int maxOrdinal = values[values.length-1].ordinal();
+        final int minOrdinal = getViewOrdinal(values[0].ordinal());
+        final int maxOrdinal = getViewOrdinal(values[values.length-1].ordinal());
 
         StringBuilder requestText = new StringBuilder("Введите тип данных:");
         for(var dataType : values)
@@ -39,7 +37,7 @@ public class ConsoleUtil {
         if(userChoice == null)
             throw new IOException("Не удалось выбрать тип данных.");
 
-        return values[userChoice];
+        return values[getOrdinalBy(userChoice)];
     }
 
     public static Integer getDataSize() throws IOException {
@@ -54,8 +52,8 @@ public class ConsoleUtil {
 
     public static InputTypeEnum getInputType() throws IOException {
         InputTypeEnum[] values = InputTypeEnum.values();
-        final int minOrdinal = values[0].ordinal();
-        final int maxOrdinal = values[values.length-1].ordinal();
+        final int minOrdinal = getViewOrdinal(values[0].ordinal());
+        final int maxOrdinal = getViewOrdinal(values[values.length-1].ordinal());
 
         StringBuilder requestText = new StringBuilder("Введите способ ввода данных:");
         for(var inputType : values)
@@ -67,7 +65,7 @@ public class ConsoleUtil {
         if(userChoice == null)
             throw new IOException("Не удалось выбрать тип входных данных.");
 
-        return values[userChoice];
+        return values[getOrdinalBy(userChoice)];
     }
 
     public static String getFileName() throws IOException {
@@ -82,8 +80,8 @@ public class ConsoleUtil {
 
     public static DataProcessEnum getDataProcessType() throws IOException {
         DataProcessEnum[] values = DataProcessEnum.values();
-        final int minOrdinal = values[0].ordinal();
-        final int maxOrdinal = values[values.length-1].ordinal();
+        final int minOrdinal = getViewOrdinal(values[0].ordinal());
+        final int maxOrdinal = getViewOrdinal(values[values.length-1].ordinal());
 
         StringBuilder requestText = new StringBuilder("Введите способ работы с данными:");
         for(var inputType : values)
@@ -95,47 +93,53 @@ public class ConsoleUtil {
         if(userChoice == null)
             throw new IOException("Не удалось способ работы с данными.");
 
-        return values[userChoice];
+        return values[getOrdinalBy(userChoice)];
     }
 
     public static boolean shouldSaveToFile() {
-        String requestText = """
-                Сохранить в файл?
-                0 - Да
-                1 - Нет
-                """;
+        YesNoEnum[] values = YesNoEnum.values();
+        final int minOrdinal = getViewOrdinal(values[0].ordinal());
+        final int maxOrdinal = getViewOrdinal(values[values.length-1].ordinal());
 
-        Integer userChoice = getValue(Integer.class, requestText, v -> v>=0 && v<2, CHOICE_INVALID_TEXT);
+        StringBuilder requestText = new StringBuilder("Сохранить в файл?");
+        for(var dataType : values)
+            requestText.append("\n").append(dataType.getOrdinalLocaleName());
+
+        Integer userChoice = getValue(Integer.class, requestText.toString(),
+                v -> v>=minOrdinal && v<= maxOrdinal, CHOICE_INVALID_TEXT);
 
         if(userChoice == null){
             System.out.println("Не удалось выбрать вариант. Сохранение не будет произведено.");
             return false;
         }
 
-        return userChoice == 0;
+        return YesNoEnum.YES.ordinal() == getOrdinalBy(userChoice);
     }
 
     public static boolean shouldRestartSession() {
-        String requestText = """
-                Запустить сессию заново?
-                0 - Да
-                1 - Нет
-                """;
+        YesNoEnum[] values = YesNoEnum.values();
+        final int minOrdinal = getViewOrdinal(values[0].ordinal());
+        final int maxOrdinal = getViewOrdinal(values[values.length-1].ordinal());
 
-        Integer userChoice = getValue(Integer.class, requestText, v -> v>=0 && v<2, CHOICE_INVALID_TEXT);
+        StringBuilder requestText = new StringBuilder("Запустить сессию заново?");
+        for(var dataType : values)
+            requestText.append("\n").append(dataType.getOrdinalLocaleName());
+
+        Integer userChoice = getValue(Integer.class, requestText.toString(),
+                v -> v>=minOrdinal && v<= maxOrdinal, CHOICE_INVALID_TEXT);
 
         if(userChoice == null){
             System.out.println("Не удалось выбрать вариант. Сохранение не будет произведено.");
             return false;
         }
 
-        return userChoice == 0;
+        return YesNoEnum.YES.ordinal() == getOrdinalBy(userChoice);
     }
 
     public static SortTypeEnum getSortType() throws IOException {
         SortTypeEnum[] values = SortTypeEnum.values();
-        final int minOrdinal = values[0].ordinal();
-        final int maxOrdinal = values[values.length-1].ordinal();
+        final int minOrdinal = getViewOrdinal(values[0].ordinal());
+        final int maxOrdinal = getViewOrdinal(values[values.length-1].ordinal());
 
         StringBuilder requestText = new StringBuilder("Выберите тип сортировки:");
         for(var dataType : values)
@@ -147,7 +151,7 @@ public class ConsoleUtil {
         if(userChoice == null)
             throw new IOException("Не удалось выбрать тип сортировки.");
 
-        return values[userChoice];
+        return values[getOrdinalBy(userChoice)];
     }
 
     @SuppressWarnings("unckecked")

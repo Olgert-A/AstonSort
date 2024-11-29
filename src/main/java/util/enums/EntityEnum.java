@@ -20,16 +20,8 @@ public enum EntityEnum implements ViewRepresentation {
 
     @Override
     public String getOrdinalLocaleName() {
-        return this.ordinal() +
+        return ViewOrdinalUtil.getViewOrdinal(this.ordinal()) +
                 " - " +
                 this.localeName;
-    }
-
-
-    @Override
-    public String toString() {
-        return "ClassReprEnum{" +
-                "localeName='" + localeName + '\'' +
-                '}';
     }
 }

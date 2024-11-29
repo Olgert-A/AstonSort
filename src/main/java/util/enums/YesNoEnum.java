@@ -2,18 +2,17 @@ package util.enums;
 
 import util.ViewRepresentation;
 
-public enum CarFieldEnum implements ViewRepresentation {
-    MODEL("Модель"),
-    POWER("Мощность"),
-    YEAR("Год выпуска"),
-    ALL("Все поля");
+public enum YesNoEnum implements ViewRepresentation {
+    YES("Да"),
+    NO("Нет");
 
     private final String localeName;
 
-    CarFieldEnum(String localeName) {
+    YesNoEnum(String localeName) {
         this.localeName = localeName;
     }
 
+    @Override
     public String getLocaleName() {
         return localeName;
     }
