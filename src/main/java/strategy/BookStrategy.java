@@ -33,7 +33,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                 title = ConsoleUtil.getTitleField();
                 pages = ConsoleUtil.getPagesField();
             } catch (IOException e) {
+                System.out.println();
                 System.out.println(e.getMessage() + " Заполнение книги начнётся с начала");
+                System.out.println();
                 continue;
             }
 
@@ -44,7 +46,8 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
                     .build();
 
             this.rawData.add(book);
-        } while (++booksCount < amount);
+            booksCount++;
+        } while (booksCount < amount);
 
         return true;
     }
@@ -138,7 +141,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             }
             bufferedReader.close();
             if (counter < amount) {
+                System.out.println();
                 System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " книг.");
+                System.out.println();
             }
             return true;
         } catch (IOException ex) {
@@ -201,7 +206,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             BookFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            System.out.println();
             return false;
         }
 
@@ -238,7 +245,9 @@ public class BookStrategy extends AbstractStrategy<Book> implements Strategy {
             searchValue = getSearchValue(searchField);
             comparator = getFieldComparator(searchField);
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            System.out.println();
             return false;
         } catch (IllegalArgumentException e) {
             return false;

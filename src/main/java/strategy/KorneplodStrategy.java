@@ -33,7 +33,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 weight = ConsoleUtil.getWeight();
                 color = ConsoleUtil.getColor();
             } catch (IOException e) {
-                System.out.println(e.getMessage() + " Заполнение книги начнётся с начала");
+                System.out.println();
+                System.out.println(e.getMessage() + " Заполнение корнеплода начнётся с начала");
+                System.out.println();
                 continue;
             }
 
@@ -44,7 +46,8 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                     .build();
 
             this.rawData.add(korneplod);
-        } while (++korneplodCount < amount);
+            korneplodCount++;
+        } while (korneplodCount < amount);
 
         return true;
     }
@@ -140,7 +143,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             }
             bufferedReader.close();
             if (counter < amount) {
+                System.out.println();
                 System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " корнеплодов.");
+                System.out.println();
             }
             return true;
         } catch (IOException ex) {
@@ -201,7 +206,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             KorneplodFieldEnum sortField = ConsoleUtil.getSortField();
             sortByField(sortType, getFieldComparator(sortField), getFieldParityChecker(sortField));
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Сортировка будет прекращена.");
+            System.out.println();
             return false;
         }
 
@@ -219,7 +226,9 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             searchValue = getSearchValue(searchField);
             comparator = getFieldComparator(searchField);
         } catch (IOException e) {
+            System.out.println();
             System.out.println(e.getMessage() + " Поиск будет прекращён.");
+            System.out.println();
             return false;
         } catch (IllegalArgumentException e) {
             return false;
