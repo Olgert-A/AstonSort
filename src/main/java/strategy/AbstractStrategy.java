@@ -50,6 +50,6 @@ public abstract class AbstractStrategy<T> implements Strategy {
 
                 this.processedData =  this.sortAlgorithm.sortEvenValues(this.rawData, comparator, parityChecker);
             }
-        };
+        }
     }
 }
