@@ -19,9 +19,9 @@ public class ConsoleUtil {
 
     public static final int DEFAULT_READ_ATTEMPTS = 3;
 
-    public static String CHOICE_INVALID_TEXT = "Ошибка: выберите одно из предлагаемых значений";
-    public static String DATA_SIZE_INVALID_TEXT = "Ошибка: Размер массива должен быть больше 2";
-    public static String FILE_NAME_INVALID_TEXT = "Ошибка: Имя файла должно быть больше 0";
+    public static final String CHOICE_INVALID_TEXT = "Выберите одно из предлагаемых значений";
+    public static final String DATA_SIZE_INVALID_TEXT = "Размер массива должен быть больше 2";
+    public static final String FILE_NAME_INVALID_TEXT = "Имя файла должно быть больше 0";
 
 
     public static EntityEnum getDataType() throws IOException {
@@ -148,12 +148,6 @@ public class ConsoleUtil {
             throw new IOException("Не удалось выбрать тип сортировки.");
 
         return values[userChoice];
-    }
-
-    @SuppressWarnings("unckecked")
-    public static <T> T getValue(Class<T> cls,
-                                 String requestText) {
-        return getValue(cls, requestText, null, null);
     }
 
     @SuppressWarnings("unckecked")

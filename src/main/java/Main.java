@@ -46,7 +46,7 @@ public class Main {
         } while (isSessionContinued);
     }
 
-    private static Strategy getEntityStrategy(EntityEnum entity) throws IOException {
+    private static Strategy getEntityStrategy(EntityEnum entity) {
         Strategy strategy = switch (entity) {
             case CAR -> new CarStrategy();
             case BOOK -> new BookStrategy();
