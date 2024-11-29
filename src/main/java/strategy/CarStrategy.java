@@ -8,7 +8,9 @@ import util.enums.SortTypeEnum;
 
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -26,7 +28,7 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
             String model;
             int power, productionYear;
 
-            System.out.println("\nЗаполните машину №" + carCount);
+            System.out.println("\nЗаполните машину №" + (carCount + 1));
             try {
                 model = ConsoleUtil.getModelField();
                 power = ConsoleUtil.getPowerField();
@@ -171,6 +173,9 @@ public class CarStrategy extends AbstractStrategy<Car> implements Strategy {
                 bufferedWriter.write("Cars");
                 bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+            bufferedWriter.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy : HH-mm")));
+            bufferedWriter.newLine();
             bufferedReader.close();
             List<Car> carList = processedData;
             for (Car car : carList) {

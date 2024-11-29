@@ -39,10 +39,10 @@ public class Korneplod {
 
     @Override
     public String toString() {
-        return "Korneplod{" +
-                "type='" + type + '\'' +
-                ", weight=" + weight +
-                ", color='" + color + '\'' +
+        return "Корнеплод{" +
+                "Тип корнеплода='" + type + '\'' +
+                ", Вес=" + weight +
+                ", Цвет='" + color + '\'' +
                 '}';
     }
 

@@ -39,10 +39,10 @@ public class Car {
 
     @Override
     public String toString() {
-        return "Car{" +
-                "model='" + model + '\'' +
-                ", power=" + power +
-                ", productionYear=" + productionYear +
+        return "Машина{" +
+                "Модель='" + model + '\'' +
+                ", Мощность=" + power +
+                ", Год выпуска=" + productionYear +
                 '}';
     }
 
