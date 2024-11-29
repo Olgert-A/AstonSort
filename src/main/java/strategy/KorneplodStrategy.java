@@ -94,7 +94,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                 }
             }
             if (!(line.equals("Korneplods")) || line == null) {
-                System.out.println("Invalid file");
+                System.out.println("Файл не содержит данных выбранного типа.");
                 return false;
             }
 
@@ -122,8 +122,6 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
                                     .build();
                             rawData.add(korneplod);
                             counter++;
-                        } else {
-                            System.out.println("Были прочитаны невалидные данные. Сущность не будет записана в файл.");
                         }
                     }
                 }
@@ -140,7 +138,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
             }
             bufferedReader.close();
             if (counter < amount) {
-                System.out.println("Файл закончился раньше, чем массив заполнился");
+                System.out.println("Файл закончился раньше, чем массив заполнился. Прочитано " + counter + " корнеплодов.");
             }
             return true;
         } catch (IOException ex) {
@@ -152,7 +150,7 @@ public class KorneplodStrategy extends AbstractStrategy<Korneplod> implements St
 
     @Override
     public boolean saveResultsToFile(String name) {
-        try (FileWriter fileWriter = new FileWriter(name);
+        try (FileWriter fileWriter = new FileWriter(name, true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             FileReader fileReader = new FileReader(name);

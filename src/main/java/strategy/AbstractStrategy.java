@@ -46,7 +46,7 @@ public abstract class AbstractStrategy<T> implements Strategy {
             case SORT -> this.processedData = this.sortAlgorithm.sort(this.rawData, comparator);
             case SORTEVENVALUES -> {
                 if (parityChecker == null)
-                    throw new IOException("Нельзя использовать сортировку четных полей для выбранного поля");
+                    throw new IOException("Нельзя использовать сортировку четных полей для выбранного поля.");
 
                 this.processedData =  this.sortAlgorithm.sortEvenValues(this.rawData, comparator, parityChecker);
             }
